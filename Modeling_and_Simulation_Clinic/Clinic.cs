@@ -106,7 +106,7 @@ public class Clinic
         patients[last_patient_id].print();
     }
 
-    public void computePatientOutcomes(int amount)
+    public void computePatientsOutcomes(int amount)
     {
         if (amount <= 0) 
             throw new ArgumentException("Amount must be greater than 0");
