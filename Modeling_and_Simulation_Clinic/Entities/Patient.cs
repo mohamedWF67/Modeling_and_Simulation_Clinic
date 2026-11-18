@@ -59,27 +59,23 @@ public class Patient
         Console.WriteLine();
     }
 
-    /// <summary>
-    /// Computes the nurse stage. Arrival time must already be set.
-    /// </summary>
-    /// <param name="nurseFreeAt">Time the nurse finishes her previous patient.</param>
-    public void ComputeNurse(int nurseFreeAt)
+    /// <summary>Patient goes in to the nurse at this time (2 min middle-age, 4 min elderly).</summary>
+    public void StartNurse(int time)
     {
-        n_start = Math.Max(arrivalTime, nurseFreeAt);
+        n_start = time;
         n_time = type == patientType.MiddleAge ? 2 : 4;
         n_end = n_start + n_time;
         n_wait = n_start - arrivalTime;
     }
 
-    public void ComputeDoctor(Doctor d)
+    /// <summary>Patient goes in to doctor d at this time.</summary>
+    public void StartDoctor(Doctor d, int time)
     {
         d_name = d.name;
-        d_start = d.freeAt >= n_end ? n_end + (d.freeAt - n_end) : n_end;
+        d_start = time;
         d_end = d_start + exam_time;
         d_wait = d_start - n_end;
-        
-        d.freeAt = d_end;
-        
+
         totalWait = n_wait + d_wait;
         timeInSystem = d_end - arrivalTime;
     }

@@ -17,6 +17,6 @@ public partial class App : Application
         c.BuildDistributionTable();
         c.InitializeDoctors();
         c.createPatients(20);
-        c.computePatientsOutcomes(99);
+        c.RunSimulation(true);
     }
 }

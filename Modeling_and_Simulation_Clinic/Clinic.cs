@@ -97,112 +97,179 @@ public class Clinic
         }
     }
 
+    // ===================== Simulation (minute by minute) =====================
+
+    // Queues (patients in the order they joined)
+    public List<Patient> nurseQueue = new();
+    public List<Patient> middleAgeQueue = new();   // waiting for Doctor 1 (or Doctor 2 if free)
+    public List<Patient> elderlyQueue = new();     // waiting for Doctor 2
+
+    // Longest each queue ever got
+    public int maxNurseQueue = 0;
+    public int maxMiddleAgeQueue = 0;
+    public int maxElderlyQueue = 0;
+
+    // Nurse state
+    public Patient nursePatient = null;   // patient with the nurse now (null = nurse free)
+    public int nurseFreeAt = 0;           // time the nurse finishes the current patient
+    public int nurseBusyMinutes = 0;
+
+    // Calendar table: every event in the order it happened
+    public List<CalendarEntry> calendar = new();
+
+    // Time the last patient finished (length of the simulation)
+    public int simulationEndTime = 0;
+
     /// <summary>
-    /// Runs the nurse and doctor stages for the first <paramref name="amount"/> patients.
-    /// The nurse serves elderly patients first: whenever she becomes free, any elderly
-    /// patient already waiting goes in before waiting middle-age patients
-    /// (first come, first served within each type).
+    /// Runs the simulation for all created patients.
+    /// The clock moves forward one minute at a time. At each minute we:
+    /// 1) finish the nurse and the doctors whose service ends now,
+    /// 2) add the patients who arrive now to the nurse queue,
+    /// 3) start the nurse and free doctors on the next patients,
+    /// 4) check whether a middle-age patient waited more than 20 minutes and leaves,
+    /// 5) update the max queue lengths and the busy minutes.
+    /// All times in this problem are whole minutes, so stepping by 1 minute is exact.
     /// </summary>
-    /// <param name="amount">Number of patients to simulate.</param>
-    /// <param name="print">Print each patient after the doctor stage.</param>
-    public void computePatientsOutcomes(int amount, bool print = true)
+    public void RunSimulation(bool print = false)
     {
-        if (amount <= 0) 
-            throw new ArgumentException("Amount must be greater than 0");
-        if (amount > patients.Count) 
-            amount = patients.Count;
-
-        List<Patient> batch = patients.Take(amount).ToList();
-
-        // 1) Arrival times: running sum of inter-arrival times (first patient arrives at 0).
-        int clock = 0;
-        foreach (Patient p in batch)
+        // Arrival time = previous arrival + inter-arrival time (first patient arrives at 0)
+        int arrival = 0;
+        foreach (Patient p in patients)
         {
-            clock += p.iat;
-            p.arrivalTime = clock;
+            arrival += p.iat;
+            p.arrivalTime = arrival;
         }
 
-        // 2) Nurse stage with elderly priority.
-        List<Patient> waiting = new(batch);   // patients not yet seen by the nurse (arrival order)
-        List<Patient> nurseOrder = new();     // order in which the nurse served them
-        int nurseFreeAt = 0;
+        int finished = 0;   // patients that were examined or left
+        int nextArrival = 0; // index of the next patient to arrive
+        int time = 0;
 
-        while (waiting.Count > 0)
+        while (finished < patients.Count)
         {
-            // If nobody has arrived yet, the nurse idles until the next arrival.
-            if (waiting[0].arrivalTime > nurseFreeAt)
-                nurseFreeAt = waiting[0].arrivalTime;
-
-            // Among those already in the clinic, take the earliest elderly patient; otherwise the earliest middle-age one.
-            Patient next =
-                waiting.FirstOrDefault(w => w.arrivalTime <= nurseFreeAt && w.type == patientType.Elderly)
-                ?? waiting[0];
-
-            next.ComputeNurse(nurseFreeAt);
-            nurseFreeAt = next.n_end;
-
-            waiting.Remove(next);
-            nurseOrder.Add(next);
-        }
-
-        // 3) Doctor stage: patients reach the doctors in the order they leave the nurse.
-        foreach (Patient p in nurseOrder)
-        {
-            assignDoctor(patients.IndexOf(p));
-            if (print)
-                p.print();
-        }
-    }
-
-    public void assignDoctor(int patient_id)
-    {
-        if (patient_id < 0 || patient_id >= patients.Count)
-            throw new ArgumentException("Patient index must be between 0 and patients.Count - 1");
-
-        Patient p = patients[patient_id];
-
-        Doctor d = null;
-        if (p.type == patientType.MiddleAge)
-        {
-            // Middle-age patients belong to Doctor 1 (the doctor that does not treat elderly).
-            Doctor main = Doctors.Find(doc => doc.curesMiddleAge && !doc.curesElderly);
-            // Doctor 2 (treats elderly) may help, but only if no elderly patient is waiting.
-            Doctor helper = Doctors.Find(doc => doc.curesMiddleAge && doc.curesElderly);
-
-            bool mainBusy = main != null && main.freeAt > p.n_end;
-            // Doctor 2 free when this patient is ready means every elderly patient
-            // assigned so far is already done, so no elderly patient is waiting.
-            bool helperIdle = helper != null && helper.freeAt <= p.n_end;
-
-            d = (mainBusy && helperIdle) ? helper : main;
-        }
-        else
-        {
-            d = Doctors.Find(doc => doc.curesElderly);
-        }
-        
-        if (d == null)
-            throw new Exception("No doctor available");
-
-        // Reneging: a middle-age patient who would wait more than 20 minutes for the
-        // doctor leaves with probability 0.2 (random number 1-20). The doctor is not
-        // occupied by a patient who leaves.
-        if (p.type == patientType.MiddleAge)
-        {
-            int expectedWait = Math.Max(d.freeAt, p.n_end) - p.n_end;
-            if (expectedWait > MaxWaitBeforeLeaving)
+            // ---- 1) End of service ----
+            if (nursePatient != null && nurseFreeAt == time)
             {
-                p.R_patient_leave = NextInt();
-                if (p.R_patient_leave <= LeaveProbabilityPercent)
+                AddEvent(time, "Nurse end", nursePatient, "goes to doctor queue");
+                if (nursePatient.type == patientType.Elderly)
+                    elderlyQueue.Add(nursePatient);
+                else
+                    middleAgeQueue.Add(nursePatient);
+                nursePatient = null;
+            }
+
+            foreach (Doctor d in Doctors)
+            {
+                if (d.currentPatient != null && d.freeAt == time)
                 {
-                    p.Leave(p.n_end + MaxWaitBeforeLeaving);
-                    return;
+                    AddEvent(time, "Doctor end", d.currentPatient, d.name);
+                    d.currentPatient = null;
+                    finished++;
                 }
             }
+
+            // ---- 2) Arrivals ----
+            while (nextArrival < patients.Count && patients[nextArrival].arrivalTime == time)
+            {
+                Patient p = patients[nextArrival];
+                nurseQueue.Add(p);
+                AddEvent(time, "Arrival", p, p.type.ToString());
+                nextArrival++;
+            }
+
+            // ---- 3) Start of service ----
+            // Nurse: elderly patients first, otherwise the first in line
+            if (nursePatient == null && nurseQueue.Count > 0)
+            {
+                Patient p = nurseQueue.Find(x => x.type == patientType.Elderly);
+                if (p == null)
+                    p = nurseQueue[0];
+
+                nurseQueue.Remove(p);
+                p.StartNurse(time);
+                nursePatient = p;
+                nurseFreeAt = p.n_end;
+                AddEvent(time, "Nurse start", p, "");
+            }
+
+            // Doctors: Doctor 1 comes first in the list, so Doctor 2 only takes a
+            // middle-age patient when Doctor 1 is busy and no elderly patient is waiting.
+            foreach (Doctor d in Doctors)
+            {
+                if (d.currentPatient != null)
+                    continue;
+
+                Patient p = null;
+                if (d.curesElderly && elderlyQueue.Count > 0)
+                {
+                    p = elderlyQueue[0];
+                    elderlyQueue.RemoveAt(0);
+                }
+                else if (d.curesMiddleAge && middleAgeQueue.Count > 0)
+                {
+                    p = middleAgeQueue[0];
+                    middleAgeQueue.RemoveAt(0);
+                }
+
+                if (p != null)
+                {
+                    p.StartDoctor(d, time);
+                    d.currentPatient = p;
+                    d.freeAt = p.d_end;
+                    AddEvent(time, "Doctor start", p, d.name);
+                }
+            }
+
+            // ---- 4) Leaving ----
+            // A middle-age patient who has waited more than 20 minutes for the doctor
+            // draws one random number; 1-20 (probability 0.2) means he leaves.
+            foreach (Patient p in middleAgeQueue.ToList())
+            {
+                bool waitedTooLong = time - p.n_end > MaxWaitBeforeLeaving;
+                if (waitedTooLong && p.R_patient_leave == Patient.Empty)
+                {
+                    p.R_patient_leave = NextInt();
+                    if (p.R_patient_leave <= LeaveProbabilityPercent)
+                    {
+                        middleAgeQueue.Remove(p);
+                        p.Leave(time);
+                        finished++;
+                        AddEvent(time, "Leave", p, "RN = " + p.R_patient_leave);
+                    }
+                }
+            }
+
+            // ---- 5) Statistics for this minute ----
+            maxNurseQueue = Math.Max(maxNurseQueue, nurseQueue.Count);
+            maxMiddleAgeQueue = Math.Max(maxMiddleAgeQueue, middleAgeQueue.Count);
+            maxElderlyQueue = Math.Max(maxElderlyQueue, elderlyQueue.Count);
+
+            if (nursePatient != null)
+                nurseBusyMinutes++;
+            foreach (Doctor d in Doctors)
+                if (d.currentPatient != null)
+                    d.busyMinutes++;
+
+            if (finished < patients.Count)
+                time++;
         }
 
-        p.ComputeDoctor(d);
+        simulationEndTime = time;
+
+        if (print)
+        {
+            foreach (Patient p in patients)
+                p.print();
+            foreach (CalendarEntry e in calendar)
+                e.print();
+        }
     }
-    
+
+    /// <summary>Adds one row to the calendar table.</summary>
+    private void AddEvent(int time, string eventName, Patient p, string details)
+    {
+        calendar.Add(new CalendarEntry(time, eventName, p.id, details));
+    }
+
+    /// <summary>Random number from 1 to 100.</summary>
     private int NextInt() => rng.NextInt(1, 100);
 }
