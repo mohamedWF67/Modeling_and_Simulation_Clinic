@@ -156,8 +156,8 @@ public class Clinic
 
     public void assignDoctor(int patient_id)
     {
-        if (patient_id < 0 || patient_id > patients.Count)
-            throw new ArgumentException("Patient ID must be between 1 and the number of patients");
+        if (patient_id < 0 || patient_id >= patients.Count)
+            throw new ArgumentException("Patient index must be between 0 and patients.Count - 1");
 
         Patient p = patients[patient_id];
 
