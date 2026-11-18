@@ -4,12 +4,287 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        xmlns:local="clr-namespace:Modeling_and_Simulation_Clinic"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
         xmlns:pages="clr-namespace:Modeling_and_Simulation_Clinic.Pages"
+        xmlns:vm="clr-namespace:Modeling_and_Simulation_Clinic.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        d:DataContext="{d:DesignInstance vm:SimulationViewModel}"
+        Title="El Dorado Clinic Simulation"
+        Height="820"
+        Width="1440"
+        MinHeight="560"
+        MinWidth="980"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!-- Event calendar: icon and colour per kind of event -->
+        <Style x:Key="CalendarEventIcon" TargetType="{x:Type ui:SymbolIcon}">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Symbol" Value="PersonArrowRight20" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Kind}" Value="Nurse">
+                    <Setter Property="Symbol" Value="PersonHeart20" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="Doctor">
+                    <Setter Property="Symbol" Value="Stethoscope20" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextHighlightBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="Leave">
+                    <Setter Property="Symbol" Value="DoorArrowLeft20" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <!-- Only the first event of each minute shows its time at full strength -->
+        <Style x:Key="CalendarTimeText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="2,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsNewTime}" Value="False">
+                    <Setter Property="Opacity" Value="0.35" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="CalendarCellText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="Margin" Value="2,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="{DynamicResource TitleBarBackgroundBrush}">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <Trigger Property="componentModel:DesignerProperties.IsInDesignMode" Value="True">
+                        <Setter Property="Background" Value="Black"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Bar -->
+        <Grid Grid.Row="0" Background="{DynamicResource TitleBarBackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left buttons -->
+            <ui:Button Grid.Column="0"
+                       Width="40"
+                       Height="40"
+                       Margin="4"
+                       Background="Transparent"
+                       BorderBrush="Transparent"
+                       ToolTip="Back"
+                       Click="BackButton_Click">
+                <ui:SymbolIcon Symbol="ArrowLeft20"/>
+            </ui:Button>
+            <ui:Button Grid.Column="1"
+                       Width="40"
+                       Height="40"
+                       Margin="0,4"
+                       Background="Transparent"
+                       BorderBrush="Transparent"
+                       ToolTip="Show or hide the menu"
+                       Click="PanelButton_Click">
+                <ui:SymbolIcon Symbol="Navigation20"/>
+            </ui:Button>
+
+            <!-- TitleBar -->
+            <ui:TitleBar Grid.Column="2"
+                         ShowMinimize="True"
+                         ShowMaximize="True"
+                         Height="48"
+                         ShowClose="True">
+                <ui:TitleBar.Icon>
+                    <ui:SymbolIcon Symbol="HeartPulse24"
+                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
+                </ui:TitleBar.Icon>
+                <ui:TitleBar.Header>
+                    <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" Text="El Dorado Clinic Simulation"/>
+                </ui:TitleBar.Header>
+                <ui:TitleBar.TrailingContent>
+                    <ui:Button Width="40"
+                               Height="40"
+                               Margin="0,0,4,0"
+                               Background="Transparent"
+                               BorderBrush="Transparent"
+                               ToolTip="Show or hide the event calendar"
+                               Click="CalendarButton_Click">
+                        <ui:SymbolIcon Symbol="PanelRight20"/>
+                    </ui:Button>
+                </ui:TitleBar.TrailingContent>
+            </ui:TitleBar>
+        </Grid>
+
+        <!-- Body: navigation on the left, the page in the middle, the event calendar on the right -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="440"/>
+                <ColumnDefinition x:Name="CalendarColumn" Width="440" MinWidth="300" MaxWidth="720"/>
+            </Grid.ColumnDefinitions>
+
+            <ui:NavigationView IsBackButtonVisible="Collapsed"
+                               VerticalContentAlignment="Stretch"
+                               HorizontalContentAlignment="Stretch"
+                               IsTopSeparatorVisible="False"
+                               IsFooterSeparatorVisible="False"
+                               IsPaneOpen="False"
+                               IsPaneToggleVisible="False"
+                               AlwaysShowHeader="True"
+                               OpenPaneLength="180"
+                               ScrollViewer.PanningMode="VerticalFirst"
+                               ScrollViewer.PanningRatio="1"
+                               ScrollViewer.VerticalScrollBarVisibility="Auto"
+                               Background="{DynamicResource TitleBarBackgroundBrush}"
+                               Name="NavigationView"
+                               Grid.Column="0">
+                <!-- NavigationCacheMode="Enabled": each page is built once and reused,
+                     so going back to a table does not rebuild it -->
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem
+                        Content="Distribution"
+                        ToolTip="Distribution"
+                        Icon="{ui:SymbolIcon DataHistogram20}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:DistributedPage}" />
+
+                    <ui:NavigationViewItemSeparator/>
+
+                    <ui:NavigationViewItem
+                        Content="Simulation table"
+                        ToolTip="Simulation table"
+                        Icon="{ui:SymbolIcon TableSimple20}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:SimulationTablePage}" />
+                </ui:NavigationView.MenuItems>
+
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem
+                        Content="Settings"
+                        ToolTip="Settings"
+                        Icon="{ui:SymbolIcon Settings20}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:SettingsPage}" />
+                </ui:NavigationView.FooterMenuItems>
+            </ui:NavigationView>
+
+            <!-- Event calendar: drawn like the page area so the two read as one surface -->
+            <Border x:Name="CalendarPanel"
+                    Grid.Column="1"
+                    Background="{DynamicResource NavigationViewContentBackground}"
+                    BorderBrush="{DynamicResource NavigationViewContentGridBorderBrush}"
+                    BorderThickness="1,1,0,0">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="4,0,0,0">
+                        <ui:SymbolIcon Symbol="CalendarLtr24"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"/>
+                        <TextBlock Text="Event Calendar"
+                                   FontWeight="SemiBold"
+                                   FontSize="18"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1"
+                               Margin="4,2,0,12"
+                               Opacity="0.65"
+                               TextWrapping="Wrap">
+                        <Run Text="{Binding Calendar.Count, Mode=OneWay}"/>
+                        <Run Text="events, in the order they happened"/>
+                    </TextBlock>
+
+                    <ui:Card Grid.Row="2"
+                             Padding="4"
+                             VerticalAlignment="Stretch"
+                             VerticalContentAlignment="Stretch">
+                        <DataGrid ItemsSource="{Binding Calendar}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserReorderColumns="False"
+                                  CanUserSortColumns="False"
+                                  HeadersVisibility="Column"
+                                  SelectionMode="Single"
+                                  EnableRowVirtualization="True"
+                                  VirtualizingPanel.IsVirtualizing="True"
+                                  VirtualizingPanel.VirtualizationMode="Recycling"
+                                  FontSize="13">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Time" Width="52">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Time}" Style="{StaticResource CalendarTimeText}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Event" Width="128">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="2,0,0,0">
+                                                <ui:SymbolIcon Style="{StaticResource CalendarEventIcon}"/>
+                                                <TextBlock Text="{Binding Event}"
+                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Patient" Width="64">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding PatientId}" Style="{StaticResource CalendarCellText}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Details" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Details}"
+                                                       ToolTip="{Binding Details}"
+                                                       Opacity="0.75"
+                                                       Style="{StaticResource CalendarCellText}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ui:Card>
+                </Grid>
+            </Border>
+
+            <!-- Drag the left edge of the calendar to resize it -->
+            <GridSplitter x:Name="CalendarSplitter"
+                          Grid.Column="1"
+                          Width="6"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Stretch"
+                          Background="Transparent"
+                          ResizeDirection="Columns"
+                          ResizeBehavior="PreviousAndCurrent"
+                          ToolTip="Drag to resize the event calendar"/>
+        </Grid>
     </Grid>
 </ui:FluentWindow>

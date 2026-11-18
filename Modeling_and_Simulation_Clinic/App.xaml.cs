@@ -1,8 +1,5 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using Modeling_and_Simulation_Clinic.Entities;
-using Modeling_and_Simulation_Clinic.Random;
+﻿using System.Windows;
+using Modeling_and_Simulation_Clinic.Services;
 
 namespace Modeling_and_Simulation_Clinic;
 
@@ -11,12 +8,9 @@ namespace Modeling_and_Simulation_Clinic;
 /// </summary>
 public partial class App : Application
 {
-    protected override async void OnStartup(StartupEventArgs e)
+    protected override void OnStartup(StartupEventArgs e)
     {
-        Clinic c = new Clinic("El Dorado");
-        c.BuildDistributionTable();
-        c.InitializeDoctors();
-        c.createPatients(20);
-        c.RunSimulation(true);
+        base.OnStartup(e);
+        ThemeService.ApplyTheme(isDarkMode: true);
     }
 }

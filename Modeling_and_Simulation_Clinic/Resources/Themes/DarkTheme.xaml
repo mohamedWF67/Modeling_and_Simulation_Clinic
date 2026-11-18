@@ -1,0 +1,59 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Same palette as the OverlayOSD (Dynamic Flyout) dark theme -->
+
+    <!-- Window Colors -->
+    <Color x:Key="WindowBackgroundColor">#1A1A1A</Color>
+    <Color x:Key="TitleBarBackgroundColor">#202020</Color>
+    <Color x:Key="CardBackgroundColor">#2A2A2A</Color>
+    <Color x:Key="ControlBackgroundColor">#444444</Color>
+    <Color x:Key="BorderColor">#333333</Color>
+
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimaryColor">#FFFFFF</Color>
+    <Color x:Key="TextSecondaryColor">#99FFFFFF</Color>
+    <Color x:Key="TextMutedColor">#888888</Color>
+    <Color x:Key="TextHighlightColor">#FFD700</Color>
+    <Color x:Key="AccentTextFillColorPrimary">#99ebff</Color>
+    <Color x:Key="AccentTextFillColorSecondary">#99ebff</Color>
+    <Color x:Key="AccentTextFillColorTertiary">#4cc2ff</Color>
+    <Color x:Key="AccentTextFillColorDisabled">#717171</Color>
+
+    <!-- Signals -->
+    <Color x:Key="SystemFillColorSuccess">#6ccb5f</Color>
+    <Color x:Key="SystemFillColorCaution">#fce100</Color>
+    <Color x:Key="SystemFillColorCritical">#ff99a4</Color>
+    <Color x:Key="SystemFillColorSuccessBackground">#393d1b</Color>
+    <Color x:Key="SystemFillColorCautionBackground">#433519</Color>
+    <Color x:Key="SystemFillColorCriticalBackground">#442726</Color>
+
+    <!-- Navigation View Pane -->
+    <Color x:Key="NavigationViewPaneBackgroundColor">#1A1A1A</Color>
+
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource WindowBackgroundColor}" />
+    <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="{StaticResource TitleBarBackgroundColor}" />
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackgroundColor}" />
+    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{StaticResource ControlBackgroundColor}" />
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}" />
+    <SolidColorBrush x:Key="TextHighlightBrush" Color="{StaticResource TextHighlightColor}" />
+
+    <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="{StaticResource AccentTextFillColorPrimary}" />
+    <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="{StaticResource AccentTextFillColorSecondary}" />
+    <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="{StaticResource AccentTextFillColorTertiary}" />
+    <SolidColorBrush x:Key="AccentTextFillColorDisabledBrush" Color="{StaticResource AccentTextFillColorDisabled}" />
+
+    <SolidColorBrush x:Key="SystemFillColorSuccessBrush" Color="{StaticResource SystemFillColorSuccess}" />
+    <SolidColorBrush x:Key="SystemFillColorCautionBrush" Color="{StaticResource SystemFillColorCaution}" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBrush" Color="{StaticResource SystemFillColorCritical}" />
+    <SolidColorBrush x:Key="SystemFillColorSuccessBackgroundBrush" Color="{StaticResource SystemFillColorSuccessBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorCautionBackgroundBrush" Color="{StaticResource SystemFillColorCautionBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBackgroundBrush" Color="{StaticResource SystemFillColorCriticalBackground}" />
+
+    <!-- Navigation View brushes (override WPF-UI theme) -->
+    <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="{DynamicResource NavigationViewPaneBackgroundColor}" />
+</ResourceDictionary>

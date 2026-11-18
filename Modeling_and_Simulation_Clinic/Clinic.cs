@@ -5,12 +5,15 @@ namespace Modeling_and_Simulation_Clinic;
 public class Clinic
 {
     public string name;
-    private LCG rng = new (123456);
-    
-    private DiscreteDistribution Patientype;
-    private DiscreteDistribution IAT;
-    private DiscreteDistribution MiddleAgedExamTime;
-    private DiscreteDistribution ElderlyExamTime;
+    /// <summary>Seed used when no seed is given to the constructor.</summary>
+    public const ulong DefaultSeed = 123456;
+
+    private LCG rng = new (DefaultSeed);
+
+    public DiscreteDistribution Patientype { get; private set; }
+    public DiscreteDistribution IAT { get; private set; }
+    public DiscreteDistribution MiddleAgedExamTime { get; private set; }
+    public DiscreteDistribution ElderlyExamTime { get; private set; }
     
     public List<Patient> patients = new ();
     public List<Doctor> Doctors = new();
@@ -22,6 +25,22 @@ public class Clinic
     
 
     public Clinic(string name) => this.name = name;
+
+    /// <summary>Creates a clinic whose random numbers start from the given seed.</summary>
+    public Clinic(string name, ulong seed) : this(name) => rng = new LCG(seed);
+
+    /// <summary>
+    /// Uses the given distribution tables (for example ones edited in the GUI).
+    /// Call this instead of BuildDistributionTable, before creating the patients.
+    /// </summary>
+    public void SetDistributionTables(DiscreteDistribution patientType, DiscreteDistribution iat,
+        DiscreteDistribution middleAgedExamTime, DiscreteDistribution elderlyExamTime)
+    {
+        Patientype = patientType;
+        IAT = iat;
+        MiddleAgedExamTime = middleAgedExamTime;
+        ElderlyExamTime = elderlyExamTime;
+    }
 
     public void BuildDistributionTable()
     {

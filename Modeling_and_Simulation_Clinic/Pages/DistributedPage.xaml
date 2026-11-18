@@ -3,10 +3,201 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Modeling_and_Simulation_Clinic.Pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:vm="clr-namespace:Modeling_and_Simulation_Clinic.ViewModels"
+      xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
       mc:Ignorable="d"
-      Title="DistributedPage" Height="450" Width="800">
+      d:DesignHeight="900"
+      d:DesignWidth="900"
+      d:DataContext="{d:DesignInstance vm:SimulationViewModel}"
+      ScrollViewer.PanningMode="VerticalFirst"
+      ScrollViewer.PanningRatio="1"
+      Title="Distribution">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+        <!-- One distribution table (value, probability, cumulative, RN range) in a card -->
+        <DataTemplate x:Key="DistributionCard" DataType="{x:Type vm:DistributionTableViewModel}">
+            <ui:Card Margin="0,0,8,8"
+                     Padding="12"
+                     VerticalAlignment="Stretch"
+                     VerticalContentAlignment="Stretch">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="4,0,4,0">
+                        <ui:SymbolIcon Symbol="{Binding Icon}"
+                                       FontSize="24"
+                                       Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,12,0"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Description}" FontSize="12" Opacity="0.5" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <!-- Shown after an edit until Compute is pressed -->
+                        <Border Grid.Column="2"
+                                Padding="8,2"
+                                CornerRadius="4"
+                                VerticalAlignment="Center"
+                                Background="{DynamicResource SystemFillColorCautionBackgroundBrush}"
+                                Visibility="{Binding HasPendingChanges, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="Not computed" FontSize="12" Foreground="{DynamicResource SystemFillColorCautionBrush}"/>
+                        </Border>
+                    </Grid>
+
+                    <ui:DataGrid Grid.Row="1"
+                                 Margin="0,8,0,0"
+                                 ItemsSource="{Binding Rows}"
+                                 AutoGenerateColumns="False"
+                                 CanUserAddRows="False"
+                                 CanUserDeleteRows="False"
+                                 CanUserSortColumns="False"
+                                 CanUserReorderColumns="False"
+                                 CanUserResizeColumns="False"
+                                 CanUserResizeRows="False"
+                                 HeadersVisibility="Column"
+                                 SelectionMode="Single"
+                                 VerticalAlignment="Top">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Value" Binding="{Binding Label}" IsReadOnly="True" Width="*"/>
+                            <DataGridTextColumn Header="Probability" Binding="{Binding Probability, StringFormat=0.00##}" Width="*"/>
+                            <DataGridTextColumn Header="Cumulative" Binding="{Binding Cumulative, StringFormat=0.00##}" IsReadOnly="True" Width="*"/>
+                            <DataGridTextColumn Header="RN range" Binding="{Binding Range}" IsReadOnly="True" Width="*"/>
+                        </DataGrid.Columns>
+                    </ui:DataGrid>
+
+                    <!-- Footer: sum of the probabilities and theoretical mean -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="4,8,4,0">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon FontSize="16" Margin="0,0,6,0" VerticalAlignment="Center">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="{x:Type ui:SymbolIcon}">
+                                        <Setter Property="Symbol" Value="CheckmarkCircle20"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSumValid}" Value="False">
+                                                <Setter Property="Symbol" Value="ErrorCircle20"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock VerticalAlignment="Center" FontSize="12" Opacity="0.8"
+                                       Text="{Binding ProbabilitySum, StringFormat='Sum of probabilities {0:0.###}'}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"
+                                   Opacity="0.8"
+                                   Visibility="{Binding ShowsMean, Converter={StaticResource BoolToVisibility}}"
+                                   Text="{Binding Mean, StringFormat='Theoretical mean {0:0.##} min'}"/>
+                    </Grid>
+                </Grid>
+            </ui:Card>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid>
-        
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <Trigger Property="componentModel:DesignerProperties.IsInDesignMode" Value="True">
+                        <Setter Property="Background" Value="Black"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+        <StackPanel Margin="16">
+            <TextBlock Text="Distribution"
+                       FontWeight="SemiBold" FontSize="18"
+                       Margin="4,0,0,2"/>
+            <TextBlock Text="Double-click a probability to change it, then press Compute to rebuild the cumulative tables and random-number ranges and run the simulation again."
+                       Opacity="0.65"
+                       TextWrapping="Wrap"
+                       Margin="4,0,0,12"/>
+
+            <ui:CardControl Icon="{ui:SymbolIcon People20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Text="Patients"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="How many patients arrive in one run"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Width="150"
+                              Minimum="1"
+                              Maximum="5000"
+                              SmallChange="1"
+                              LargeChange="10"
+                              MaxDecimalPlaces="0"
+                              Value="{Binding PatientCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </ui:CardControl>
+            <ui:CardControl Icon="{ui:SymbolIcon NumberSymbol20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Text="Seed"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="Start value of the random number generator; the same seed gives the same run"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Width="150"
+                              Minimum="1"
+                              Maximum="2147483646"
+                              SmallChange="1"
+                              MaxDecimalPlaces="0"
+                              SpinButtonPlacementMode="Hidden"
+                              Value="{Binding Seed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </ui:CardControl>
+            <Grid Margin="4"/>
+            <ui:CardControl Icon="{ui:SymbolIcon Calculator20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Text="Compute"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="{Binding Summary}"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button Content="Reset tables"
+                               Icon="{ui:SymbolIcon ArrowReset20}"
+                               ToolTip="Put the original probabilities back"
+                               Click="CommitTableEdits"
+                               Command="{Binding ResetDistributionsCommand}"
+                               Margin="0,0,8,0"/>
+                    <ui:Button Content="Compute"
+                               Icon="{ui:SymbolIcon Play20}"
+                               Appearance="Primary"
+                               Click="CommitTableEdits"
+                               Command="{Binding ComputeCommand}"/>
+                </StackPanel>
+            </ui:CardControl>
+
+            <ui:InfoBar Title="Could not compute"
+                        Message="{Binding ErrorMessage}"
+                        IsOpen="{Binding HasError, Mode=OneWay}"
+                        IsClosable="False"
+                        Severity="Error"
+                        Margin="0,4,0,0"/>
+
+            <StackPanel Orientation="Horizontal" Margin="4,16,4,8">
+                <ui:SymbolIcon Symbol="DataHistogram24"
+                               FontSize="18"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"/>
+                <TextBlock Text="Distribution tables" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Two cards per row when there is room, one otherwise (see code-behind) -->
+            <UniformGrid x:Name="TablesGrid" Columns="2" Margin="0,0,-8,0" SizeChanged="TablesGrid_SizeChanged">
+                <ContentControl Content="{Binding PatientType}" ContentTemplate="{StaticResource DistributionCard}" Focusable="False"/>
+                <ContentControl Content="{Binding InterArrivalTime}" ContentTemplate="{StaticResource DistributionCard}" Focusable="False"/>
+                <ContentControl Content="{Binding MiddleAgeExamTime}" ContentTemplate="{StaticResource DistributionCard}" Focusable="False"/>
+                <ContentControl Content="{Binding ElderlyExamTime}" ContentTemplate="{StaticResource DistributionCard}" Focusable="False"/>
+            </UniformGrid>
+        </StackPanel>
     </Grid>
 </Page>
