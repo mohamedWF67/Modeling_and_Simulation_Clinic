@@ -129,11 +129,21 @@ public class Clinic
         Doctor d = null;
         if (p.type == patientType.MiddleAge)
         {
-            d = Doctors.Find(d => d.curesMiddleAge);
+            // Middle-age patients belong to Doctor 1 (the doctor that does not treat elderly).
+            Doctor main = Doctors.Find(doc => doc.curesMiddleAge && !doc.curesElderly);
+            // Doctor 2 (treats elderly) may help, but only if no elderly patient is waiting.
+            Doctor helper = Doctors.Find(doc => doc.curesMiddleAge && doc.curesElderly);
+
+            bool mainBusy = main != null && main.freeAt > p.n_end;
+            // Doctor 2 free when this patient is ready means every elderly patient
+            // assigned so far is already done, so no elderly patient is waiting.
+            bool helperIdle = helper != null && helper.freeAt <= p.n_end;
+
+            d = (mainBusy && helperIdle) ? helper : main;
         }
         else
         {
-            d = Doctors.Find(d => d.curesElderly);
+            d = Doctors.Find(doc => doc.curesElderly);
         }
         
         if (d == null)

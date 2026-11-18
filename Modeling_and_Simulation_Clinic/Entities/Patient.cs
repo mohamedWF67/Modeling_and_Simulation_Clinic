@@ -64,7 +64,7 @@ public class Patient
         d_name = d.name;
         d_start = d.freeAt >= n_end ? n_end + (d.freeAt - n_end) : n_end;
         d_end = d_start + exam_time;
-        d_wait = d_end - exam_time - d_start;
+        d_wait = d_start - n_end;
         
         d.freeAt = d_end;
         
