@@ -171,6 +171,13 @@
                         Icon="{ui:SymbolIcon TableSimple20}"
                         NavigationCacheMode="Enabled"
                         TargetPageType="{x:Type pages:SimulationTablePage}" />
+                    
+                    <ui:NavigationViewItem
+                        Content="Results"
+                        ToolTip="Results"
+                        Icon="{ui:SymbolIcon StarThreeQuarter12}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:ResultsPage}" />
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>

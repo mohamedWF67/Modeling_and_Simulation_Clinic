@@ -1,0 +1,194 @@
+﻿<Page x:Class="Modeling_and_Simulation_Clinic.Pages.ResultsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
+      xmlns:viewModels="clr-namespace:Modeling_and_Simulation_Clinic.ViewModels"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance viewModels:statisticsViewModel}"
+      d:DesignHeight="600"
+      d:DesignWidth="800"
+      Title="Results">
+    <Grid>
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <Trigger Property="componentModel:DesignerProperties.IsInDesignMode" Value="True">
+                        <Setter Property="Background" Value="Black"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+        <StackPanel Orientation="Vertical" Margin="16">
+            <TextBlock Text="Results"
+                       FontWeight="SemiBold" FontSize="18"
+                       Margin="4,0,0,4"/>
+            <TextBlock Text="Q1 Mean Exam Time"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,0,0,4"/>
+                <ui:Card>
+                    <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                            <TextBlock FontWeight="Bold" Text="Total"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q1TotalExamTime}"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanTotalExamTime}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                            <TextBlock FontWeight="Bold" Text="Middle Age"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q1TotalMiddleExamTime}"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanMiddleExamTime}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                            <TextBlock FontWeight="Bold" Text="Elderly"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q1TotalElderlyExamTime}"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanElderlyExamTime}"/>
+                        </StackPanel>
+                    </Grid>
+                </ui:Card>
+            <TextBlock Text="Q2 Wait Average Time"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,4,0,4"/>
+            <ui:Card>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Total"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q2TotalWaitAverage}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q2MeanWaitAverage}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q2TotalWaitAverageMiddleAge}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q2MeanWaitAverageMiddleAge}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q2TotalWaitAverageElderly}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q2MeanWaitAverageElderly}"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+            
+            <TextBlock Text="Q3 Wait Average Time"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,4,0,4"/>
+            <ui:Card>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Nurse"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxNurseQueue}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxMiddleAgeQueue}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxElderlyQueue}"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+            
+            <TextBlock Text="Q4 Wait probability"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,4,0,4"/>
+            <ui:Card>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Nurse"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4NurseWaitCount}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding ProbNurseWait}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Doctor Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4middleDoctorWaitCount}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding ProbMiddleDoctorWait}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text=" Doctor Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4ElderlyDoctorWaitCount}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding ProbElderlyDoctorWait}"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+            
+            <TextBlock Text="Q5 Idle Time Portion"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,4,0,4"/>
+            <ui:Card>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Nurse"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q5PortionNurseIdle}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Doctor Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q5PortionMiddleDoctorIdle}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text=" Doctor Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q5PortionElderlyDoctorIdle}"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+            <TextBlock Text="Q6 Theoretical vs Actual exam time"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,4,0,4"/>
+            <ui:Card>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*,*,*">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock TextAlignment="left" FontWeight="Bold" Text="Type"/>
+                        <TextBlock HorizontalAlignment="Left" FontSize="24" Padding="0,8" Text="Theoretical"/>
+                        <Separator/>
+                        <TextBlock HorizontalAlignment="left" FontSize="24" Padding="0,8" Text="Actual"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Nurse Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseTheoreticalMiddleAgeAvgTime}"/>
+                        <Separator/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseMiddleAgeAvgTime}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Nurse Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseTheoreticalElderlyAvgTime}"/>
+                        <Separator/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseElderlyAvgTime}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Doctor Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6DoctorTheoreticalMiddleAvgTime}"/>
+                        <Separator/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanMiddleExamTime}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="4" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text=" Doctor Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6DoctorTheoreticalElderlyAvgTime}"/>
+                        <Separator/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanElderlyExamTime}"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+            
+            <TextBlock Text="Q7 Theoretical vs Actual IAT"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,4,0,4"/>
+            <ui:Card>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Theoretical"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q7TheoreticalIAT}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Actual"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q7MeanIat}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Text="Error"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q7IATError}"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+        </StackPanel>
+    </Grid>
+</Page>

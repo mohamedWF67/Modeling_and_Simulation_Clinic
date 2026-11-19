@@ -120,6 +120,8 @@ public partial class SimulationViewModel : ObservableObject
             Summary = $"{count} patients, seed {seedValue}. The last patient finished at minute " +
                       $"{clinic.simulationEndTime}; {left} left without seeing a doctor.";
             ErrorMessage = null;
+            statisticsViewModel.Instance.ConnectClinic(clinic);
+            statisticsViewModel.Instance.RefreshStatistics();
         }
         catch (ArgumentException ex)
         {

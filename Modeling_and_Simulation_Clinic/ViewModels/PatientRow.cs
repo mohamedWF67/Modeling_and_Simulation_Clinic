@@ -3,8 +3,7 @@ using Modeling_and_Simulation_Clinic.Entities;
 namespace Modeling_and_Simulation_Clinic.ViewModels;
 
 /// <summary>
-/// One row of the simulation table. WPF can only bind to properties, so this copies the
-/// fields of a simulated <see cref="Patient"/>. Null values are shown as "—" in the table.
+/// Each row in the patient table.
 /// </summary>
 public sealed record PatientRow(
     int Id,
@@ -28,7 +27,7 @@ public sealed record PatientRow(
     int? RnLeave,
     bool Left)
 {
-    /// <summary>Copies the values of a patient after the simulation has run.</summary>
+    /// <summary>Gets the values from a patient.</summary>
     public static PatientRow From(Patient p) => new(
         p.id,
         p.type == Patient.patientType.Elderly ? "Elderly" : "Middle-age",

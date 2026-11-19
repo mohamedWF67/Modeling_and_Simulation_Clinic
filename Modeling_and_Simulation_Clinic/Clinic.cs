@@ -8,7 +8,7 @@ public class Clinic
     /// <summary>Seed used when no seed is given to the constructor.</summary>
     public const ulong DefaultSeed = 123456;
 
-    private LCG rng = new (DefaultSeed);
+    private LCG rng = new LCG(DefaultSeed);
 
     public DiscreteDistribution Patientype { get; private set; }
     public DiscreteDistribution IAT { get; private set; }
@@ -273,7 +273,7 @@ public class Clinic
         }
 
         simulationEndTime = time;
-
+        ComputeStatistics();
         if (print)
         {
             foreach (Patient p in patients)
@@ -281,6 +281,115 @@ public class Clinic
             foreach (CalendarEntry e in calendar)
                 e.print();
         }
+    }
+    
+    public double TotalExamTime = 0, totalCount = 0;
+    public double TotalMiddleExamTime = 0, totalMiddleCount = 0;
+    public double TotalElderlyExamTime = 0, totalElderlyCount = 0;
+    
+    public double TotalWaitAverage = 0, Totalwaitcount = 0;
+    public double TotalWaitAverageMiddleAge = 0, totalMiddleWaitcount = 0;
+    public double TotalWaitAverageElderly = 0, totalElderlyWaitcount = 0;
+    
+    public int nurseWaitCount = 0;
+    public int middleDoctorWaitCount = 0;   // Doctor 1 queue
+    public int elderlyDoctorWaitCount = 0;  // Doctor 2 queue
+    
+    public double NurseSumMiddleAgeTime = 0, NurseSumElderlyTime = 0;
+    
+    public double TotalIat = 0;
+    
+    public double MeanExamTime;
+    public double MeanMiddleExamTime;
+    public double MeanElderlyExamTime;
+        
+    public double MeanWaitAverage;
+    public double MeanWaitAverageMiddleAge;
+    public double MeanWaitAverageElderly;
+
+    public double ProbNurseWait;
+    public double ProbMiddleDoctorWait;
+    public double ProbElderlyDoctorWait;
+
+    public double PortionNurseIdle;
+    public double PortionMiddleDoctorIdle;
+    public double PortionElderlyDoctorIdle;
+
+    public double NurseMiddleAgeAvgTime = 0, NurseElderlyAvgTime = 0;
+    
+    public double MeanIat = 0;
+
+    private void ComputeStatistics()
+    {
+        foreach (Patient p in patients)
+        {
+            Totalwaitcount++;
+            TotalWaitAverage += p.totalWait;
+            if (p.n_wait > 0)
+                nurseWaitCount++;
+            
+            if (p.type == patientType.MiddleAge)
+            {
+                totalMiddleWaitcount++;
+                TotalWaitAverageMiddleAge += p.totalWait;
+                
+                if (p.d_wait > 0) middleDoctorWaitCount++;
+            }
+            else
+            {
+                totalElderlyWaitcount++;
+                TotalWaitAverageElderly += p.totalWait;
+                
+                if (p.d_wait > 0) elderlyDoctorWaitCount++;
+            }
+            
+            TotalIat += p.iat;
+            
+            if (p.leftClinic)
+                continue;
+            
+            totalCount++;
+            TotalExamTime += p.exam_time;
+
+            if (p.type == patientType.MiddleAge)
+            {
+                totalMiddleCount++;
+                TotalMiddleExamTime += p.exam_time;
+                NurseSumMiddleAgeTime += p.n_time;
+            }
+            else
+            {
+                totalElderlyCount++;
+                TotalElderlyExamTime += p.exam_time;
+                NurseSumElderlyTime += p.n_time;
+            }
+        }
+
+        MeanExamTime = TotalExamTime / totalCount;
+        MeanMiddleExamTime = TotalMiddleExamTime / totalMiddleCount; 
+        MeanElderlyExamTime = TotalElderlyExamTime / totalElderlyCount;
+        
+        MeanWaitAverage = TotalWaitAverage / Totalwaitcount;
+        MeanWaitAverageMiddleAge = TotalWaitAverageMiddleAge / totalMiddleWaitcount;
+        MeanWaitAverageElderly = TotalWaitAverageElderly / totalElderlyWaitcount;
+
+        ProbNurseWait = (double)nurseWaitCount / Totalwaitcount;
+        ProbMiddleDoctorWait = (double)middleDoctorWaitCount / totalMiddleWaitcount;
+        ProbElderlyDoctorWait = (double)elderlyDoctorWaitCount / totalElderlyWaitcount;
+        
+        PortionNurseIdle = 1 - (double)nurseBusyMinutes / simulationEndTime;
+        Console.WriteLine($"Portion nurse idle: {nurseBusyMinutes} / {simulationEndTime} = {PortionNurseIdle}");
+        foreach (Doctor d in Doctors)
+            if (d.curesElderly && d.curesMiddleAge)
+                PortionElderlyDoctorIdle += 1 - (double)d.busyMinutes / simulationEndTime;
+            else
+                PortionMiddleDoctorIdle += 1 - (double)d.busyMinutes / simulationEndTime;
+        
+        NurseMiddleAgeAvgTime = NurseSumMiddleAgeTime / totalMiddleCount;
+        NurseElderlyAvgTime = NurseSumElderlyTime / totalElderlyCount;
+        
+        MeanIat = TotalIat / ((double)patients.Count - 1);
+        Console.WriteLine($"Mean IAT: {TotalIat} {MeanIat}");
     }
 
     /// <summary>Adds one row to the calendar table.</summary>
