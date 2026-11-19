@@ -6,6 +6,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
       xmlns:viewModels="clr-namespace:Modeling_and_Simulation_Clinic.ViewModels"
+      xmlns:wpf="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewModels:statisticsViewModel}"
       d:DesignHeight="600"
@@ -31,17 +32,17 @@
                 <ui:Card>
                     <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
                         <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                            <TextBlock FontWeight="Bold" Text="Total"/>
+                            <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Total"/>
                             <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q1TotalExamTime}"/>
                             <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanTotalExamTime}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                            <TextBlock FontWeight="Bold" Text="Middle Age"/>
+                            <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Middle Age"/>
                             <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q1TotalMiddleExamTime}"/>
                             <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanMiddleExamTime}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                            <TextBlock FontWeight="Bold" Text="Elderly"/>
+                            <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Elderly"/>
                             <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q1TotalElderlyExamTime}"/>
                             <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanElderlyExamTime}"/>
                         </StackPanel>
@@ -53,38 +54,110 @@
             <ui:Card>
                 <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Total"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Total"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q2TotalWaitAverage}"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q2MeanWaitAverage}"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q2MeanWaitAverage}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Middle Age"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q2TotalWaitAverageMiddleAge}"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q2MeanWaitAverageMiddleAge}"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q2MeanWaitAverageMiddleAge}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>   
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Elderly"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q2TotalWaitAverageElderly}"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q2MeanWaitAverageElderly}"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q2MeanWaitAverageElderly}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>
                     </StackPanel>
                 </Grid>
             </ui:Card>
             
-            <TextBlock Text="Q3 Wait Average Time"
+            <TextBlock Text="Q3 Maximum Queue Length"
                        FontWeight="SemiBold" FontSize="14"
                        Margin="4,4,0,4"/>
             <ui:Card>
                 <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Nurse"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Nurse"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxNurseQueue}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Middle Age"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxMiddleAgeQueue}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Elderly"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxElderlyQueue}"/>
                     </StackPanel>
                 </Grid>
@@ -96,19 +169,91 @@
             <ui:Card>
                 <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Nurse"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Nurse"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4NurseWaitCount}"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding ProbNurseWait}"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q4ProbNurseWait}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Doctor Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Doctor Middle Age"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4middleDoctorWaitCount}"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding ProbMiddleDoctorWait}"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q4ProbMiddleDoctorWait}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>              
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text=" Doctor Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text=" Doctor Elderly"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4ElderlyDoctorWaitCount}"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding ProbElderlyDoctorWait}"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q4ProbElderlyDoctorWait}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>              
                     </StackPanel>
                 </Grid>
             </ui:Card>
@@ -119,16 +264,88 @@
             <ui:Card>
                 <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Nurse"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q5PortionNurseIdle}"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Nurse"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q5PortionNurseIdleDouble}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+                                    
+                                    <wpf:XamlGaugeBackgroundSeries/>
+                                    
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Doctor Middle Age"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q5PortionMiddleDoctorIdle}"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Doctor Middle Age"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q5PortionMiddleDoctorIdleDouble}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text=" Doctor Elderly"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q5PortionElderlyDoctorIdle}"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text=" Doctor Elderly"/>
+                        <wpf:PieChart
+                            Background="Transparent"
+                            Width="120"
+                            Height="120"
+                            Margin="0,8,0,0"
+                            InitialRotation="-90"
+                            MinValue="0"
+                            MaxValue="1">
+
+                            <wpf:PieChart.Series>
+                                <wpf:SeriesCollection>
+
+                                    <wpf:XamlGaugeSeries
+                                        GaugeValue="{Binding Q5PortionElderlyDoctorIdleDouble}"
+                                        DataLabelsSize="36"
+                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                        MaxRadialColumnWidth="10"/>
+
+                                    <wpf:XamlGaugeBackgroundSeries/>
+
+                                </wpf:SeriesCollection>
+                            </wpf:PieChart.Series>
+
+                        </wpf:PieChart>
                     </StackPanel>
                 </Grid>
             </ui:Card>
@@ -144,25 +361,25 @@
                         <TextBlock HorizontalAlignment="left" FontSize="24" Padding="0,8" Text="Actual"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Nurse Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Nurse Middle Age"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseTheoreticalMiddleAgeAvgTime}"/>
                         <Separator/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseMiddleAgeAvgTime}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Nurse Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Nurse Elderly"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseTheoreticalElderlyAvgTime}"/>
                         <Separator/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6NurseElderlyAvgTime}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="3" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Doctor Middle Age"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Doctor Middle Age"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6DoctorTheoreticalMiddleAvgTime}"/>
                         <Separator/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanMiddleExamTime}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="4" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text=" Doctor Elderly"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text=" Doctor Elderly"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q6DoctorTheoreticalElderlyAvgTime}"/>
                         <Separator/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanElderlyExamTime}"/>
@@ -176,15 +393,15 @@
             <ui:Card>
                 <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Theoretical"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Theoretical"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q7TheoreticalIAT}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Actual"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Actual"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q7MeanIat}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
-                        <TextBlock FontWeight="Bold" Text="Error"/>
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Error"/>
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q7IATError}"/>
                     </StackPanel>
                 </Grid>

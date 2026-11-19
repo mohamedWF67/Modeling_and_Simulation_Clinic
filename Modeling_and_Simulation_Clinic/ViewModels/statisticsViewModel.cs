@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using LiveChartsCore;
+using LiveChartsCore.Kernel;
+using LiveChartsCore.SkiaSharpView;
 
 namespace Modeling_and_Simulation_Clinic.ViewModels;
 
@@ -139,20 +142,7 @@ public class statisticsViewModel
             return result;
         }
     }
-
-    public string Q2MeanWaitAverage
-    {
-        get
-        {
-            string result = "";
-            if (Clinic != null)
-            {
-                result = Clinic.MeanWaitAverage.ToString("0.00");
-            }
-            return result;
-        }
-    }
-
+    
     public string Q2TotalWaitAverageMiddleAge
     {
         get
@@ -161,19 +151,6 @@ public class statisticsViewModel
             if (Clinic != null)
             {
                 result = $"{Clinic.TotalWaitAverageMiddleAge.ToString()} / {Clinic.totalMiddleWaitcount}";
-            }
-            return result;
-        }
-    }
-
-    public string Q2MeanWaitAverageMiddleAge
-    {
-        get
-        {
-            string result = "";
-            if (Clinic != null)
-            {
-                result = Clinic.MeanWaitAverageMiddleAge.ToString("0.00");
             }
             return result;
         }
@@ -191,19 +168,10 @@ public class statisticsViewModel
             return result;
         }
     }
-
-    public string Q2MeanWaitAverageElderly
-    {
-        get
-        {
-            string result = "";
-            if (Clinic != null)
-            {
-                result = Clinic.MeanWaitAverageElderly.ToString("0.00");
-            }
-            return result;
-        }
-    }
+    
+    public double Q2MeanWaitAverage => Math.Round(Clinic?.MeanWaitAverage ?? 0,2);
+    public double Q2MeanWaitAverageMiddleAge => Math.Round(Clinic?.MeanWaitAverageMiddleAge ?? 0,2);
+    public double Q2MeanWaitAverageElderly => Math.Round(Clinic?.MeanWaitAverageElderly ?? 0,2);
 
     #endregion
 
@@ -256,17 +224,17 @@ public class statisticsViewModel
         }
     }
     
-    public string ProbNurseWait => Clinic?.ProbNurseWait.ToString("0.00") ?? "";
-    public string ProbMiddleDoctorWait => Clinic?.ProbMiddleDoctorWait.ToString("0.00") ?? "";
-    public string ProbElderlyDoctorWait => Clinic?.ProbElderlyDoctorWait.ToString("0.00") ?? "";
+    public double Q4ProbNurseWait => Math.Round(Clinic?.ProbNurseWait ?? 0,2);
+    public string Q4ProbMiddleDoctorWait => Math.Round(Clinic?.ProbMiddleDoctorWait ?? 0,2).ToString("0.00");
+    public string Q4ProbElderlyDoctorWait => Math.Round(Clinic?.ProbElderlyDoctorWait ?? 0,2).ToString("0.00");
     
     #endregion
     
     #region Q5
     
-    public string Q5PortionNurseIdle => Clinic?.PortionNurseIdle.ToString("0.00") ?? "";
-    public string Q5PortionMiddleDoctorIdle => Clinic?.PortionMiddleDoctorIdle.ToString("0.00") ?? "";
-    public string Q5PortionElderlyDoctorIdle => Clinic?.PortionElderlyDoctorIdle.ToString("0.00") ?? "";
+    public double Q5PortionNurseIdleDouble => Math.Round(Clinic?.PortionNurseIdle ?? 0,2);
+    public double Q5PortionMiddleDoctorIdleDouble => Math.Round(Clinic?.PortionMiddleDoctorIdle ?? 0,2);
+    public double Q5PortionElderlyDoctorIdleDouble => Math.Round(Clinic?.PortionElderlyDoctorIdle ?? 0,2);
     
     #endregion
 
@@ -301,4 +269,7 @@ public class statisticsViewModel
     }
 
     #endregion
+    
+    public Func<ChartPoint, string> GaugeFormatter { get; } =
+        point => point.Coordinate.PrimaryValue.ToString("0.00");
 }
