@@ -70,6 +70,7 @@
                             <lvc:AxesCollection>
                                 <lvc:XamlAxis
                                     LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                     AxisName="Minutes"
                                     MinLimit="0"/>
                             </lvc:AxesCollection>
@@ -200,6 +201,7 @@
                             <lvc:AxesCollection>
                                 <lvc:XamlAxis
                                     LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                     AxisName="Minutes"
                                     MinLimit="0"/>
                             </lvc:AxesCollection>
@@ -256,6 +258,7 @@
                             <lvc:AxesCollection>
                                 <lvc:XamlAxis
                                     LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                     AxisName="Number of people in queue"
                                     MinLimit="0"/>
                             </lvc:AxesCollection>
@@ -296,7 +299,7 @@
                                     <wpf:XamlGaugeSeries
                                         GaugeValue="{Binding Q4ProbNurseWait}"
                                         DataLabelsSize="36"
-                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsFormatter="{Binding GaugeFormatterPercentages}"
                                         DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                         MaxRadialColumnWidth="10"/>
 
@@ -325,7 +328,7 @@
                                     <wpf:XamlGaugeSeries
                                         GaugeValue="{Binding Q4ProbMiddleDoctorWait}"
                                         DataLabelsSize="36"
-                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsFormatter="{Binding GaugeFormatterPercentages}"
                                         DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                         MaxRadialColumnWidth="10"/>
 
@@ -354,7 +357,7 @@
                                     <wpf:XamlGaugeSeries
                                         GaugeValue="{Binding Q4ProbElderlyDoctorWait}"
                                         DataLabelsSize="36"
-                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsFormatter="{Binding GaugeFormatterPercentages}"
                                         DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                         MaxRadialColumnWidth="10"/>
 
@@ -390,7 +393,7 @@
                                     <wpf:XamlGaugeSeries
                                         GaugeValue="{Binding Q5PortionNurseIdleDouble}"
                                         DataLabelsSize="36"
-                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsFormatter="{Binding GaugeFormatterPercentages}"
                                         DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                         MaxRadialColumnWidth="10"/>
                                     
@@ -418,7 +421,7 @@
                                     <wpf:XamlGaugeSeries
                                         GaugeValue="{Binding Q5PortionMiddleDoctorIdleDouble}"
                                         DataLabelsSize="36"
-                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsFormatter="{Binding GaugeFormatterPercentages}"
                                         DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                         MaxRadialColumnWidth="10"/>
 
@@ -446,7 +449,7 @@
                                     <wpf:XamlGaugeSeries
                                         GaugeValue="{Binding Q5PortionElderlyDoctorIdleDouble}"
                                         DataLabelsSize="36"
-                                        DataLabelsFormatter="{Binding GaugeFormatter}"
+                                        DataLabelsFormatter="{Binding GaugeFormatterPercentages}"
                                         DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
                                         MaxRadialColumnWidth="10"/>
 
@@ -463,6 +466,7 @@
                        FontWeight="SemiBold" FontSize="14"
                        Margin="4,4,0,4"/>
             <ui:Card>
+                <StackPanel>
                 <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*,*,*">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
                         <TextBlock TextAlignment="left" FontWeight="Bold" Text="Type"/>
@@ -495,6 +499,57 @@
                         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q1MeanElderlyExamTime}"/>
                     </StackPanel>
                 </Grid>
+                    <lvc:CartesianChart
+                        Height="350"
+                        Background="Transparent"
+                        LegendPosition="Bottom"
+                        LegendTextPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                        DrawMarginFrame="{x:Null}">
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+
+                                <!-- Theoretical -->
+                                <lvc:XamlRowSeries
+                                    Values="{Binding Q6TheoreticalTimes}"
+                                    DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    SeriesName="Theoretical"
+                                    MaxBarWidth="40"
+                                    ShowDataLabels="True"
+                                    DataLabelsPosition="End"
+                                    DataLabelsSize="14"/>
+                                
+                                <lvc:XamlRowSeries
+                                    Values="{Binding Q6ActualTimes}"
+                                    DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    SeriesName="Actual"
+                                    MaxBarWidth="40"
+                                    ShowDataLabels="True"
+                                    DataLabelsPosition="End"
+                                    DataLabelsSize="14"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    AxisName="Minutes"
+                                    MinLimit="0"
+                                    TextSize="12"
+                                    LabelsPaint="{lvc:SolidColorPaint Color=White}"
+                                    NamePaint="{lvc:SolidColorPaint Color=White}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                        <!-- Y axis: Categories -->
+                        <lvc:CartesianChart.YAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    Labels="{Binding Q6Labels}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.YAxes>
+                    </lvc:CartesianChart>
+                </StackPanel>
             </ui:Card>
             
             <TextBlock Text="Q7 Theoretical vs Actual IAT"

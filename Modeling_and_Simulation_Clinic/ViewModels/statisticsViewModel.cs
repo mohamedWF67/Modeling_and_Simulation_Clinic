@@ -49,6 +49,7 @@ public class statisticsViewModel
         UpdateQ1ExamTimes();
         UpdateQ2MeanWaitTimes();
         UpdateQ3MaxQueue();
+        UpdateQ6();
     }
 
     #region Q1
@@ -249,12 +250,39 @@ public class statisticsViewModel
 
     #region Q6
 
-    public string Q6NurseMiddleAgeAvgTime => Clinic?.NurseMiddleAgeAvgTime.ToString("0.00") ?? "";
-    public string Q6NurseElderlyAvgTime => Clinic?.NurseElderlyAvgTime.ToString("0.00") ?? "";
-    public string Q6NurseTheoreticalMiddleAgeAvgTime => 2.ToString();
-    public string Q6NurseTheoreticalElderlyAvgTime => 4.ToString();
-    public string Q6DoctorTheoreticalMiddleAvgTime => Clinic?.MiddleAgedExamTime.TheoreticalMean.ToString("0.00") ?? "";
-    public string Q6DoctorTheoreticalElderlyAvgTime => Clinic?.ElderlyExamTime.TheoreticalMean.ToString("0.00") ?? "";
+    public double Q6NurseMiddleAgeAvgTime => Math.Round(Clinic?.NurseMiddleAgeAvgTime ?? 0,2);
+    public double Q6NurseElderlyAvgTime => Math.Round(Clinic?.NurseElderlyAvgTime ?? 0,2);
+    public double Q6NurseTheoreticalMiddleAgeAvgTime => 2;
+    public double Q6NurseTheoreticalElderlyAvgTime => 4;
+    public double Q6DoctorTheoreticalMiddleAvgTime => Math.Round(Clinic?.MiddleAgedExamTime.TheoreticalMean ?? 0,2);
+    public double Q6DoctorTheoreticalElderlyAvgTime => Math.Round(Clinic?.ElderlyExamTime.TheoreticalMean ?? 0,2);
+    
+    public ObservableCollection<double> Q6TheoreticalTimes { get; } = new();
+    public ObservableCollection<double> Q6ActualTimes { get; } = new();
+
+    public string[] Q6Labels { get; } =
+    [
+        "Nurse Middle-age",
+        "Nurse Elderly",
+        "Doctor Middle-age",
+        "Doctor Elderly"
+    ];
+
+    public void UpdateQ6()
+    {
+        Q6TheoreticalTimes.Clear();
+        Q6ActualTimes.Clear();
+
+        Q6TheoreticalTimes.Add(Q6NurseTheoreticalMiddleAgeAvgTime);
+        Q6TheoreticalTimes.Add(Q6NurseTheoreticalElderlyAvgTime);
+        Q6TheoreticalTimes.Add(Q6DoctorTheoreticalMiddleAvgTime);
+        Q6TheoreticalTimes.Add(Q6DoctorTheoreticalElderlyAvgTime);
+
+        Q6ActualTimes.Add(Q6NurseMiddleAgeAvgTime);
+        Q6ActualTimes.Add(Q6NurseElderlyAvgTime);
+        Q6ActualTimes.Add(Q1MeanMiddleExamTime);
+        Q6ActualTimes.Add(Q1MeanElderlyExamTime);
+    }
 
     #endregion
 
@@ -281,4 +309,7 @@ public class statisticsViewModel
     
     public Func<ChartPoint, string> GaugeFormatter { get; } =
         point => point.Coordinate.PrimaryValue.ToString("0.00");
+    
+    public Func<ChartPoint, string> GaugeFormatterPercentages { get; } =
+        point => (point.Coordinate.PrimaryValue * 100).ToString("0") + "%";
 }
