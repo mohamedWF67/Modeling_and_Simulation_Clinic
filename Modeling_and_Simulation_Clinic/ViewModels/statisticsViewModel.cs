@@ -7,7 +7,7 @@ using LiveChartsCore.SkiaSharpView;
 
 namespace Modeling_and_Simulation_Clinic.ViewModels;
 
-public class statisticsViewModel
+public class statisticsViewModel : INotifyPropertyChanged
 {
     public static statisticsViewModel Instance { get; } = new();
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -46,6 +46,7 @@ public class statisticsViewModel
     public void RefreshStatistics()
     {
         OnPropertyChanged(string.Empty);
+        
         UpdateQ1ExamTimes();
         UpdateQ2MeanWaitTimes();
         UpdateQ3MaxQueue();
