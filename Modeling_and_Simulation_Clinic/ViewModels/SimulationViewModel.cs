@@ -13,6 +13,10 @@ public partial class SimulationViewModel : ObservableObject
 {
     public const string ClinicName = "El Dorado";
     public const int MaxPatients = 5000;
+    [ObservableProperty]
+    private double? replications = 10;
+
+    public const int MaxReplications = 500;
 
     /// <summary>The one instance used by the window and all pages.</summary>
     public static SimulationViewModel Instance { get; } = new();
@@ -93,35 +97,39 @@ public partial class SimulationViewModel : ObservableObject
         try
         {
             int count = ReadWholeNumber(PatientCount, "Patients", 1, MaxPatients);
-            int seedValue = ReadWholeNumber(Seed, "Seed", 1, int.MaxValue - 1);
+            int seedValue = ReadWholeNumber(Seed, "Seed", 1, int.MaxValue - MaxReplications);
+            int reps = ReadWholeNumber(Replications, "Replications", 1, MaxReplications); 
+            // ... build the four distributions as before ...
 
             DiscreteDistribution type = PatientType.Build();
             DiscreteDistribution iat = InterArrivalTime.Build();
             DiscreteDistribution middleAge = MiddleAgeExamTime.Build();
             DiscreteDistribution elderly = ElderlyExamTime.Build();
-
-            var clinic = new Clinic(ClinicName, (ulong)seedValue);
-            clinic.SetDistributionTables(type, iat, middleAge, elderly);
-            clinic.InitializeDoctors();
-            clinic.createPatients(count);
-            clinic.RunSimulation();
-
-            PatientType.Load(type);
-            InterArrivalTime.Load(iat);
-            MiddleAgeExamTime.Load(middleAge);
-            ElderlyExamTime.Load(elderly);
-
-            Patients = clinic.patients.Select(PatientRow.From).ToList();
-            Calendar = clinic.calendar
-                .Select((entry, i) => CalendarRow.From(entry, i == 0 ? null : clinic.calendar[i - 1]))
+            
+            List<Clinic> runs = new();
+            Console.Write($"Seed value ({reps}): ");
+            for (int r = 0; r < reps; r++)
+            {
+                // every run gets its own seed, so every run is different but repeatable
+                var clinic = new Clinic(ClinicName, (ulong)(seedValue + r));
+                clinic.SetDistributionTables(type, iat, middleAge, elderly);
+                clinic.InitializeDoctors();
+                clinic.createPatients(count);
+                clinic.RunSimulation();
+                runs.Add(clinic);
+                Console.Write($"{seedValue + r},");
+            }
+            Console.WriteLine();
+            
+            // the tables and the calendar still show one run (the first one)
+            Clinic first = runs[0];
+            Patients = first.patients.Select(PatientRow.From).ToList();
+            Calendar = first.calendar
+                .Select((entry, i) => CalendarRow.From(entry, i == 0 ? null : first.calendar[i - 1]))
                 .ToList();
-
-            int left = clinic.patients.Count(p => p.leftClinic);
-            Summary = $"{count} patients, seed {seedValue}. The last patient finished at minute " +
-                      $"{clinic.simulationEndTime}; {left} left without seeing a doctor.";
+            Summary = $"{count} patients run {reps} times.";
             ErrorMessage = null;
-            statisticsViewModel.Instance.ConnectClinic(clinic);
-            statisticsViewModel.Instance.RefreshStatistics();
+            statisticsViewModel.Instance.ConnectRuns(runs);
         }
         catch (ArgumentException ex)
         {

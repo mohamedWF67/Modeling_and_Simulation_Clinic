@@ -378,7 +378,6 @@ public class Clinic
         ProbElderlyDoctorWait = (double)elderlyDoctorWaitCount / totalElderlyWaitcount;
         
         PortionNurseIdle = 1 - (double)nurseBusyMinutes / simulationEndTime;
-        Console.WriteLine($"Portion nurse idle: {nurseBusyMinutes} / {simulationEndTime} = {PortionNurseIdle}");
         foreach (Doctor d in Doctors)
             if (d.curesElderly && d.curesMiddleAge)
                 PortionElderlyDoctorIdle += 1 - (double)d.busyMinutes / simulationEndTime;
@@ -389,7 +388,6 @@ public class Clinic
         NurseElderlyAvgTime = NurseSumElderlyTime / totalElderlyCount;
         
         MeanIat = TotalIat / ((double)patients.Count - 1);
-        Console.WriteLine($"Mean IAT: {TotalIat} {MeanIat}");
     }
 
     /// <summary>Adds one row to the calendar table.</summary>

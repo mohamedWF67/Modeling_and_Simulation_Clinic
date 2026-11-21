@@ -11,29 +11,27 @@ public class statisticsViewModel : INotifyPropertyChanged
 {
     public static statisticsViewModel Instance { get; } = new();
     public event PropertyChangedEventHandler? PropertyChanged;
+    
+    private List<Clinic> runs = new();
 
-    private Clinic? _clinic;
+    /// <summary>First run, used for the "sum / count" text that only makes sense for one run.</summary>
+    public Clinic? Clinic => runs.Count > 0 ? runs[0] : null;
 
-    public Clinic? Clinic
+    /// <summary>Number of runs the averages are taken over.</summary>
+    public int RunCount => runs.Count;
+
+    /// <summary>Stores all runs and refreshes every value on the page.</summary>
+    public void ConnectRuns(List<Clinic> newRuns)
     {
-        get => _clinic;
-        private set
-        {
-            _clinic = value;
-            RefreshStatistics();
-        }
+        runs = newRuns;
+        RefreshStatistics();
     }
+
+    /// <summary>Average of one statistic over all runs, rounded to 2 decimals.</summary>
+    private double Avg(Func<Clinic, double> statistic) =>
+        runs.Count == 0 ? 0 : Math.Round(runs.Average(statistic), 2);
     
     public statisticsViewModel() { }
-    public void ConnectClinic(Clinic c)
-    {
-        Clinic = c;
-    }
-    
-    public void Reset()
-    {
-        Clinic = null;
-    }
     
     protected void OnPropertyChanged(
         [CallerMemberName] string? propertyName = null)
