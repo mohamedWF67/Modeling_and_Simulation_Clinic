@@ -106,10 +106,10 @@
 
             <!-- TitleBar -->
             <ui:TitleBar Grid.Column="2"
-                         ShowMinimize="True"
-                         ShowMaximize="True"
-                         Height="48"
-                         ShowClose="True">
+                         ShowMinimize="False"
+                         ShowMaximize="False"
+                         ShowClose="False"
+                         Height="48">
                 <ui:TitleBar.Icon>
                     <ui:SymbolIcon Symbol="HeartPulse24"
                                    Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
@@ -118,15 +118,57 @@
                     <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" Text="El Dorado Clinic Simulation"/>
                 </ui:TitleBar.Header>
                 <ui:TitleBar.TrailingContent>
-                    <ui:Button Width="40"
-                               Height="40"
-                               Margin="0,0,4,0"
-                               Background="Transparent"
-                               BorderBrush="Transparent"
-                               ToolTip="Show or hide the event calendar"
-                               Click="CalendarButton_Click">
-                        <ui:SymbolIcon Symbol="PanelRight20"/>
-                    </ui:Button>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:Button Width="40"
+                                   Height="40"
+                                   Margin="0,0,4,0"
+                                   Background="Transparent"
+                                   BorderBrush="Transparent"
+                                   ToolTip="Show or hide the event calendar"
+                                   Click="CalendarButton_Click">
+                            <ui:SymbolIcon Symbol="PanelRight20"/>
+                        </ui:Button>
+                        <ui:Button Width="40"
+                                   Height="40"
+                                   Margin="0,0,4,0"
+                                   Background="Transparent"
+                                   BorderBrush="Transparent"
+                                   Foreground="White"
+                                   ToolTip="Minimize"
+                                   Click="Minimize_OnClick">
+                            <ui:SymbolIcon Symbol="Line48" RenderTransformOrigin="0.5,0.5">
+                                <ui:SymbolIcon.RenderTransform>
+                                    <RotateTransform Angle="45"/>
+                                </ui:SymbolIcon.RenderTransform>
+                            </ui:SymbolIcon>
+                        </ui:Button>
+                        <ui:Button Width="40"
+                                   Height="40"
+                                   Margin="0,0,4,0"
+                                   Background="Transparent"
+                                   BorderBrush="Transparent"
+                                   Foreground="White"
+                                   ToolTip="Maximize"
+                                   Click="Maximize_OnClick">
+                            <ui:SymbolIcon Symbol="Maximize48" RenderTransformOrigin="0.5,0.5">
+                            </ui:SymbolIcon>
+                        </ui:Button>
+                        <ui:Button Width="40"
+                                   Height="40"
+                                   Margin="0,0,4,0"
+                                   Background="Transparent"
+                                   BorderBrush="Transparent"
+                                   MouseOverBackground="{ui:ThemeResource SystemFillColorCriticalBackgroundBrush}"
+                                   Foreground="White"
+                                   ToolTip="Close"
+                                   Click="CloseBtn_OnClick">
+                            <ui:SymbolIcon Symbol="Add48" RenderTransformOrigin="0.5,0.5">
+                                <ui:SymbolIcon.RenderTransform>
+                                    <RotateTransform Angle="45"/>
+                                </ui:SymbolIcon.RenderTransform>
+                            </ui:SymbolIcon>
+                        </ui:Button>
+                    </StackPanel>
                 </ui:TitleBar.TrailingContent>
             </ui:TitleBar>
         </Grid>
@@ -175,7 +217,7 @@
                     <ui:NavigationViewItem
                         Content="Results"
                         ToolTip="Results"
-                        Icon="{ui:SymbolIcon StarThreeQuarter12}"
+                        Icon="{ui:SymbolIcon DataUsage20}"
                         NavigationCacheMode="Enabled"
                         TargetPageType="{x:Type pages:ResultsPage}" />
                 </ui:NavigationView.MenuItems>

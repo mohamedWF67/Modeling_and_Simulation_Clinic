@@ -60,4 +60,22 @@ public partial class MainWindow
         CalendarPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         CalendarSplitter.Visibility = CalendarPanel.Visibility;
     }
+
+    private void CloseBtn_OnClick(object sender, RoutedEventArgs e)
+    {
+        Application.Current.Shutdown();
+    }
+
+    private void Minimize_OnClick(object sender, RoutedEventArgs e)
+    {
+        Application.Current.MainWindow.WindowState = WindowState.Minimized;
+    }
+
+    private void Maximize_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
+            Application.Current.MainWindow.WindowState = WindowState.Normal;
+        else 
+            Application.Current.MainWindow.WindowState = WindowState.Maximized;
+    }
 }
