@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using LiveChartsCore;
 using LiveChartsCore.Kernel;
@@ -45,6 +46,9 @@ public class statisticsViewModel
     public void RefreshStatistics()
     {
         OnPropertyChanged(string.Empty);
+        UpdateQ1ExamTimes();
+        UpdateQ2MeanWaitTimes();
+        UpdateQ3MaxQueue();
     }
 
     #region Q1
@@ -60,20 +64,6 @@ public class statisticsViewModel
             return result;
         }
     }
-    
-    public string Q1MeanTotalExamTime
-    {
-        get
-        {
-            string result = "";
-            if (Clinic != null)
-            {
-                result = Clinic.MeanExamTime.ToString("0.00");
-            }
-            return result;
-        }
-    }
-    
     public string Q1TotalMiddleExamTime
     {
         get
@@ -87,18 +77,6 @@ public class statisticsViewModel
         }
     }
 
-    public string Q1MeanMiddleExamTime
-    {
-        get
-        {
-            string result = "";
-            if (Clinic != null)
-            {
-                result = Clinic.MeanMiddleExamTime.ToString("0.00");
-            }
-            return result;
-        }
-    }
 
     public string Q1TotalElderlyExamTime
     {
@@ -112,19 +90,28 @@ public class statisticsViewModel
             return result;
         }
     }
+    public double Q1MeanTotalExamTime => Math.Round(Clinic?.MeanExamTime ?? 0,2);
+    public double Q1MeanMiddleExamTime => Math.Round(Clinic?.MeanMiddleExamTime ?? 0,2);
+
+    public double Q1MeanElderlyExamTime => Math.Round(Clinic?.MeanElderlyExamTime ?? 0,2);
     
-    public string Q1MeanElderlyExamTime
+    public ObservableCollection<double> Q1ExamTimes { get; } = new();
+
+    public void UpdateQ1ExamTimes()
     {
-        get
-        {
-            string result = "";
-            if (Clinic != null)
-            {
-                result = Clinic.MeanElderlyExamTime.ToString("0.00");
-            }
-            return result;
-        }
+        Q1ExamTimes.Clear();
+        
+        Q1ExamTimes.Add(Q1MeanElderlyExamTime);
+        Q1ExamTimes.Add(Q1MeanMiddleExamTime);
+        Q1ExamTimes.Add(Q1MeanTotalExamTime);
     }
+    
+    public string[] Q1ExamTimeLabels { get; } =
+    [        
+        "Elderly",
+        "Middle-age",
+        "Total",
+    ];
     
     #endregion
 
@@ -172,14 +159,36 @@ public class statisticsViewModel
     public double Q2MeanWaitAverage => Math.Round(Clinic?.MeanWaitAverage ?? 0,2);
     public double Q2MeanWaitAverageMiddleAge => Math.Round(Clinic?.MeanWaitAverageMiddleAge ?? 0,2);
     public double Q2MeanWaitAverageElderly => Math.Round(Clinic?.MeanWaitAverageElderly ?? 0,2);
+    
+    public ObservableCollection<double> Q2MeanWaitTimes { get; } = new();
+
+    public void UpdateQ2MeanWaitTimes()
+    {
+        Q2MeanWaitTimes.Clear();
+        
+        Q2MeanWaitTimes.Add(Q2MeanWaitAverageElderly);
+        Q2MeanWaitTimes.Add(Q2MeanWaitAverageMiddleAge);
+        Q2MeanWaitTimes.Add(Q2MeanWaitAverage);
+    }
 
     #endregion
 
     #region Q3
 
-    public string Q3maxNurseQueue => Clinic?.maxNurseQueue.ToString() ?? "";
-    public string Q3maxMiddleAgeQueue => Clinic?.maxMiddleAgeQueue.ToString() ?? "";
-    public string Q3maxElderlyQueue => Clinic?.maxElderlyQueue.ToString() ?? "";
+    public double Q3maxNurseQueue => Clinic?.maxNurseQueue ?? 0;
+    public double Q3maxMiddleAgeQueue => Clinic?.maxMiddleAgeQueue ?? 0;
+    public double Q3maxElderlyQueue => Clinic?.maxElderlyQueue ?? 0;
+    
+    public ObservableCollection<double> Q3MaxQueue { get; } = new();
+
+    public void UpdateQ3MaxQueue()
+    {
+        Q3MaxQueue.Clear();
+        
+        Q3MaxQueue.Add(Q3maxElderlyQueue);
+        Q3MaxQueue.Add(Q3maxMiddleAgeQueue);
+        Q3MaxQueue.Add(Q3maxNurseQueue);
+    }
 
     #endregion
     
