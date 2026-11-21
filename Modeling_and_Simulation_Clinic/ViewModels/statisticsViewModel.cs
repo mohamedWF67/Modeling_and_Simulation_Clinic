@@ -50,6 +50,7 @@ public class statisticsViewModel
         UpdateQ2MeanWaitTimes();
         UpdateQ3MaxQueue();
         UpdateQ6();
+        UpdateQ7();
     }
 
     #region Q1
@@ -288,8 +289,8 @@ public class statisticsViewModel
 
     #region Q7
 
-    public string Q7MeanIat => Clinic?.MeanIat.ToString("0.00") ?? "";
-    public string Q7TheoreticalIAT => Clinic?.IAT.TheoreticalMean.ToString("0.00") ?? "";
+    public double Q7MeanIat => Math.Round(Clinic?.MeanIat ?? 0,2);
+    public double Q7TheoreticalIAT => Math.Round(Clinic?.IAT.TheoreticalMean ?? 0,2);
 
     public string Q7IATError
     {
@@ -299,10 +300,26 @@ public class statisticsViewModel
             if (Clinic != null)
             {
                 double error = Math.Abs(Clinic.MeanIat - Clinic.IAT.TheoreticalMean) / Clinic.IAT.TheoreticalMean * 100;
-                result = error.ToString("0.00");
+                result = error.ToString("0.00") + " %";
             }
             return result;
         }
+    }
+    
+    public ObservableCollection<double> Q7IATTimes { get; } = new();
+    
+    public string[] Q7Labels { get; } =
+    [
+        "Theoretical",
+        "Actual"
+    ];
+    
+    public void UpdateQ7()
+    {
+        Q7IATTimes.Clear();
+        
+        Q7IATTimes.Add(Q7MeanIat);
+        Q7IATTimes.Add(Q7TheoreticalIAT);
     }
 
     #endregion
