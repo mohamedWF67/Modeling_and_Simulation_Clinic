@@ -91,10 +91,9 @@ public class statisticsViewModel : INotifyPropertyChanged
             return result;
         }
     }
-    public double Q1MeanTotalExamTime => Math.Round(Clinic?.MeanExamTime ?? 0,2);
-    public double Q1MeanMiddleExamTime => Math.Round(Clinic?.MeanMiddleExamTime ?? 0,2);
-
-    public double Q1MeanElderlyExamTime => Math.Round(Clinic?.MeanElderlyExamTime ?? 0,2);
+    public double Q1MeanTotalExamTime => Avg(c => c.MeanExamTime);
+    public double Q1MeanMiddleExamTime => Avg(c => c.MeanMiddleExamTime);
+    public double Q1MeanElderlyExamTime => Avg(c => c.MeanElderlyExamTime);
     
     public ObservableCollection<double> Q1ExamTimes { get; } = new();
 
@@ -157,9 +156,9 @@ public class statisticsViewModel : INotifyPropertyChanged
         }
     }
     
-    public double Q2MeanWaitAverage => Math.Round(Clinic?.MeanWaitAverage ?? 0,2);
-    public double Q2MeanWaitAverageMiddleAge => Math.Round(Clinic?.MeanWaitAverageMiddleAge ?? 0,2);
-    public double Q2MeanWaitAverageElderly => Math.Round(Clinic?.MeanWaitAverageElderly ?? 0,2);
+    public double Q2MeanWaitAverage => Avg(c => c.MeanWaitAverage);
+    public double Q2MeanWaitAverageMiddleAge => Avg(c => c.MeanWaitAverageMiddleAge);
+    public double Q2MeanWaitAverageElderly => Avg(c => c.MeanWaitAverageElderly);
     
     public ObservableCollection<double> Q2MeanWaitTimes { get; } = new();
 
@@ -176,9 +175,9 @@ public class statisticsViewModel : INotifyPropertyChanged
 
     #region Q3
 
-    public double Q3maxNurseQueue => Clinic?.maxNurseQueue ?? 0;
-    public double Q3maxMiddleAgeQueue => Clinic?.maxMiddleAgeQueue ?? 0;
-    public double Q3maxElderlyQueue => Clinic?.maxElderlyQueue ?? 0;
+    public double Q3maxNurseQueue => Avg(c => c.maxNurseQueue);
+    public double Q3maxMiddleAgeQueue => Avg(c => c.maxMiddleAgeQueue);
+    public double Q3maxElderlyQueue => Avg(c => c.maxElderlyQueue);
     
     public ObservableCollection<double> Q3MaxQueue { get; } = new();
 
@@ -234,24 +233,24 @@ public class statisticsViewModel : INotifyPropertyChanged
         }
     }
     
-    public double Q4ProbNurseWait => Math.Round(Clinic?.ProbNurseWait ?? 0,2);
-    public string Q4ProbMiddleDoctorWait => Math.Round(Clinic?.ProbMiddleDoctorWait ?? 0,2).ToString("0.00");
-    public string Q4ProbElderlyDoctorWait => Math.Round(Clinic?.ProbElderlyDoctorWait ?? 0,2).ToString("0.00");
+    public double Q4ProbNurseWait => Avg(c => c.ProbNurseWait);
+    public string Q4ProbMiddleDoctorWait => Avg(c => c.ProbMiddleDoctorWait).ToString("0.00");
+    public string Q4ProbElderlyDoctorWait => Avg(c => c.ProbElderlyDoctorWait).ToString("0.00");
     
     #endregion
     
     #region Q5
     
-    public double Q5PortionNurseIdleDouble => Math.Round(Clinic?.PortionNurseIdle ?? 0,2);
-    public double Q5PortionMiddleDoctorIdleDouble => Math.Round(Clinic?.PortionMiddleDoctorIdle ?? 0,2);
-    public double Q5PortionElderlyDoctorIdleDouble => Math.Round(Clinic?.PortionElderlyDoctorIdle ?? 0,2);
+    public double Q5PortionNurseIdleDouble => Avg(c => c.PortionNurseIdle);
+    public double Q5PortionMiddleDoctorIdleDouble => Avg(c => c.PortionMiddleDoctorIdle);
+    public double Q5PortionElderlyDoctorIdleDouble => Avg(c => c.PortionElderlyDoctorIdle);
     
     #endregion
 
     #region Q6
 
-    public double Q6NurseMiddleAgeAvgTime => Math.Round(Clinic?.NurseMiddleAgeAvgTime ?? 0,2);
-    public double Q6NurseElderlyAvgTime => Math.Round(Clinic?.NurseElderlyAvgTime ?? 0,2);
+    public double Q6NurseMiddleAgeAvgTime => Avg(c => c.NurseMiddleAgeAvgTime);
+    public double Q6NurseElderlyAvgTime => Avg(c => c.NurseElderlyAvgTime);
     public double Q6NurseTheoreticalMiddleAgeAvgTime => 2;
     public double Q6NurseTheoreticalElderlyAvgTime => 4;
     public double Q6DoctorTheoreticalMiddleAvgTime => Math.Round(Clinic?.MiddleAgedExamTime.TheoreticalMean ?? 0,2);
@@ -288,22 +287,12 @@ public class statisticsViewModel : INotifyPropertyChanged
 
     #region Q7
 
-    public double Q7MeanIat => Math.Round(Clinic?.MeanIat ?? 0,2);
+    public double Q7MeanIat => Avg(c => c.MeanIat);
     public double Q7TheoreticalIAT => Math.Round(Clinic?.IAT.TheoreticalMean ?? 0,2);
+    
+    public double Q7IATErrorDouble =>  Math.Abs(Q7MeanIat - Q7TheoreticalIAT) / Q7TheoreticalIAT * 100;
 
-    public string Q7IATError
-    {
-        get
-        {
-            string result = "";
-            if (Clinic != null)
-            {
-                double error = Math.Abs(Clinic.MeanIat - Clinic.IAT.TheoreticalMean) / Clinic.IAT.TheoreticalMean * 100;
-                result = error.ToString("0.00") + " %";
-            }
-            return result;
-        }
-    }
+    public string Q7IATError => Q7IATErrorDouble.ToString("0.00") + " %";
     
     public ObservableCollection<double> Q7IATTimes { get; } = new();
     
