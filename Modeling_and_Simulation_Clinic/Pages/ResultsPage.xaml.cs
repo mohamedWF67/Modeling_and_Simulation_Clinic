@@ -8,6 +8,6 @@ public partial class ResultsPage : Page
     public ResultsPage()
     {
         InitializeComponent();
-        DataContext = statisticsViewModel.Instance;
+        DataContext = StatisticsViewModel.Instance;
     }
 }

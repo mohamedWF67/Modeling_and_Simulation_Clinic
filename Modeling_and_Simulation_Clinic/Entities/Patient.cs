@@ -2,10 +2,15 @@
 
 namespace Modeling_and_Simulation_Clinic.Entities;
 
+/// <summary>
+/// One patient: the random numbers drawn for him, the times at the nurse and the doctor,
+/// and his waiting times. One patient is one row of the simulation table.
+/// </summary>
 public class Patient
 {
     public const int Empty = -1;
 
+    /// <summary>The two kinds of patients in the clinic.</summary>
     public enum patientType
     {
         MiddleAge = 0,
@@ -43,10 +48,13 @@ public class Patient
     /// <summary>Time the patient left without examination (Empty if examined).</summary>
     public int leaveTime = Empty;
 
+    /// <summary>Creates a patient with a random id (not used by the simulation).</summary>
     public Patient() => id = Guid.NewGuid().GetHashCode();
 
+    /// <summary>Creates patient number <paramref name="id"/>.</summary>
     public Patient(int id) => this.id = id;
 
+    /// <summary>Prints the patient's row to the console (for checking against the hand table).</summary>
     public void print()
     {
         Console.WriteLine($"Patient {id} Info:");

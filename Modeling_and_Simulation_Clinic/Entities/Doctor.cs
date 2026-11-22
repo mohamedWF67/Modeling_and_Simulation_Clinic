@@ -13,7 +13,9 @@ public class Doctor
     public Patient currentPatient = null;   // patient being examined now (null = free)
     public int freeAt = 0;                  // time the current examination ends
     public int busyMinutes = 0;             // total minutes spent examining (for idle time)
+    public double idlePortion = 0;          // 1 - busyMinutes / length of the run (Q5)
 
+    /// <summary>Creates a doctor who examines the given kinds of patients.</summary>
     public Doctor(string name, bool curesElderly, bool curesMiddleAge)
     {
         this.name = name;

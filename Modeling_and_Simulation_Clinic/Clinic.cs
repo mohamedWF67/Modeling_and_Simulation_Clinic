@@ -2,6 +2,11 @@
 using Modeling_and_Simulation_Clinic.Random;
 using patientType = Modeling_and_Simulation_Clinic.Entities.Patient.patientType;
 namespace Modeling_and_Simulation_Clinic;
+
+/// <summary>
+/// The medical clinic: one nurse, two doctors (three for Q8), the queues, the rules of
+/// the problem, the minute-by-minute simulation and the statistics of one run.
+/// </summary>
 public class Clinic
 {
     public string name;
@@ -10,7 +15,7 @@ public class Clinic
 
     private LCG rng = new LCG(DefaultSeed);
 
-    public DiscreteDistribution Patientype { get; private set; }
+    public DiscreteDistribution PatientType { get; private set; }
     public DiscreteDistribution IAT { get; private set; }
     public DiscreteDistribution MiddleAgedExamTime { get; private set; }
     public DiscreteDistribution ElderlyExamTime { get; private set; }
@@ -24,6 +29,7 @@ public class Clinic
     public const int LeaveProbabilityPercent = 20;
     
 
+    /// <summary>Creates a clinic that uses the default seed.</summary>
     public Clinic(string name) => this.name = name;
 
     /// <summary>Creates a clinic whose random numbers start from the given seed.</summary>
@@ -36,15 +42,16 @@ public class Clinic
     public void SetDistributionTables(DiscreteDistribution patientType, DiscreteDistribution iat,
         DiscreteDistribution middleAgedExamTime, DiscreteDistribution elderlyExamTime)
     {
-        Patientype = patientType;
+        PatientType = patientType;
         IAT = iat;
         MiddleAgedExamTime = middleAgedExamTime;
         ElderlyExamTime = elderlyExamTime;
     }
 
+    /// <summary>Builds the four distribution tables given in the project brief.</summary>
     public void BuildDistributionTable()
     {
-        Patientype = new DiscreteDistribution
+        PatientType = new DiscreteDistribution
         (
             [0, 1], [0.70, 0.30]
         );
@@ -65,22 +72,34 @@ public class Clinic
         );
     }
 
-    public void InitializeDoctors()
+    /// <summary>
+    /// Creates the doctors. D1 examines middle-age patients only. D2 examines elderly patients
+    /// first and helps with middle-age patients when no elderly patient is waiting.
+    /// With 3 doctors (Q8) the extra doctor D3 is a second middle-age doctor.
+    /// The list order matters: free doctors take patients in this order, so D2 helps last.
+    /// </summary>
+    /// <param name="doctorCount">2 (the clinic as described) or 3 (Q8).</param>
+    public void InitializeDoctors(int doctorCount = 2)
     {
-        Doctors.Add(
-            new Doctor("D1", false, true)
-            );
-        Doctors.Add(
-            new Doctor("D2", true, true)
-            );
+        if (doctorCount < 2 || doctorCount > 3)
+            throw new ArgumentException("The clinic has 2 or 3 doctors.");
+
+        Doctors.Add(new Doctor("D1", false, true));
+        if (doctorCount == 3)
+            Doctors.Add(new Doctor("D3", false, true));
+        Doctors.Add(new Doctor("D2", true, true));
     }
 
+    /// <summary>
+    /// Creates the next patient: draws the random numbers for the type, the inter-arrival
+    /// time (not for the first patient, who arrives at 0) and the exam time.
+    /// </summary>
     public void CreatePatient(bool print = false)
     {
         Patient p = new Patient(patients.Count + 1);
         
         p.R_patient_type = NextInt();
-        p.type = (patientType)Patientype.Sample(p.R_patient_type);
+        p.type = (patientType)PatientType.Sample(p.R_patient_type);
 
         if (patients.Count == 0)
         {
@@ -106,7 +125,8 @@ public class Clinic
             patients.Last().print();
     }
 
-    public void createPatients(int amount, bool print = false)
+    /// <summary>Creates <paramref name="amount"/> patients (call before RunSimulation).</summary>
+    public void CreatePatients(int amount, bool print = false)
     {
         if (amount <= 0) 
             throw new ArgumentException("Amount must be greater than 0");
@@ -210,8 +230,8 @@ public class Clinic
                 AddEvent(time, "Nurse start", p, "");
             }
 
-            // Doctors: Doctor 1 comes first in the list, so Doctor 2 only takes a
-            // middle-age patient when Doctor 1 is busy and no elderly patient is waiting.
+            // Doctors: D2 is last in the list, so it only takes a middle-age patient when
+            // every middle-age doctor is busy and no elderly patient is waiting.
             foreach (Doctor d in Doctors)
             {
                 if (d.currentPatient != null)
@@ -283,112 +303,125 @@ public class Clinic
         }
     }
     
-    public double TotalExamTime = 0, totalCount = 0;
-    public double TotalMiddleExamTime = 0, totalMiddleCount = 0;
-    public double TotalElderlyExamTime = 0, totalElderlyCount = 0;
-    
-    public double TotalWaitAverage = 0, Totalwaitcount = 0;
-    public double TotalWaitAverageMiddleAge = 0, totalMiddleWaitcount = 0;
-    public double TotalWaitAverageElderly = 0, totalElderlyWaitcount = 0;
-    
-    public int nurseWaitCount = 0;
-    public int middleDoctorWaitCount = 0;   // Doctor 1 queue
-    public int elderlyDoctorWaitCount = 0;  // Doctor 2 queue
-    
-    public double NurseSumMiddleAgeTime = 0, NurseSumElderlyTime = 0;
-    
-    public double TotalIat = 0;
-    
-    public double MeanExamTime;
-    public double MeanMiddleExamTime;
-    public double MeanElderlyExamTime;
-        
-    public double MeanWaitAverage;
-    public double MeanWaitAverageMiddleAge;
-    public double MeanWaitAverageElderly;
+    #region Statistics
 
-    public double ProbNurseWait;
-    public double ProbMiddleDoctorWait;
-    public double ProbElderlyDoctorWait;
+    // Sums and counts of one run (shown as "sum / count" for the first run)
+    public int ExamTimeSum, ExamCount;                    // Q1: examined patients only
+    public int MiddleExamTimeSum, MiddleExamCount;
+    public int ElderlyExamTimeSum, ElderlyExamCount;
 
-    public double PortionNurseIdle;
-    public double PortionMiddleDoctorIdle;
-    public double PortionElderlyDoctorIdle;
+    public int WaitSum, PatientCount;                     // Q2: every patient, also those who left
+    public int MiddleWaitSum, MiddleCount;
+    public int ElderlyWaitSum, ElderlyCount;
 
-    public double NurseMiddleAgeAvgTime = 0, NurseElderlyAvgTime = 0;
-    
-    public double MeanIat = 0;
+    public int NurseWaitCount;                            // Q4: patients who waited for the nurse
+    public int MiddleDoctorWaitCount;                     // middle-age patients who waited for a doctor
+    public int ElderlyDoctorWaitCount;                    // elderly patients who waited for a doctor
 
+    public int NurseMiddleTimeSum, NurseElderlyTimeSum;   // Q6: time with the nurse
+    public int IatSum;                                    // Q7: inter-arrival times
+    public int LeftCount;                                 // middle-age patients who left without examination
+
+    // Results of one run
+    public double MeanExamTime, MeanMiddleExamTime, MeanElderlyExamTime;        // Q1
+    public double MeanWait, MeanWaitMiddleAge, MeanWaitElderly;                 // Q2
+    public double ProbNurseWait, ProbMiddleDoctorWait, ProbElderlyDoctorWait;   // Q4
+    public double PortionNurseIdle;                                             // Q5
+    public double PortionMiddleDoctorIdle;    // D1
+    public double PortionElderlyDoctorIdle;   // D2
+    public double PortionExtraDoctorIdle;     // D3 (0 when the clinic has 2 doctors)
+    public double NurseMiddleAgeAvgTime, NurseElderlyAvgTime;                   // Q6
+    public double MeanIat;                                                      // Q7
+    public double LeftPercent;                // % of middle-age patients who left
+
+    /// <summary>
+    /// Computes the answers to Q1-Q7 for this run. Called once at the end of RunSimulation.
+    /// Every division goes through Divide, so a run with (for example) no elderly patients
+    /// gives 0 instead of NaN.
+    /// </summary>
     private void ComputeStatistics()
     {
         foreach (Patient p in patients)
         {
-            Totalwaitcount++;
-            TotalWaitAverage += p.totalWait;
+            // Q2, Q4, Q6 (nurse) and Q7 count every patient, also the ones who left
+            PatientCount++;
+            WaitSum += p.totalWait;
+            IatSum += p.iat;
             if (p.n_wait > 0)
-                nurseWaitCount++;
-            
-            if (p.type == patientType.MiddleAge)
-            {
-                totalMiddleWaitcount++;
-                TotalWaitAverageMiddleAge += p.totalWait;
-                
-                if (p.d_wait > 0) middleDoctorWaitCount++;
-            }
-            else
-            {
-                totalElderlyWaitcount++;
-                TotalWaitAverageElderly += p.totalWait;
-                
-                if (p.d_wait > 0) elderlyDoctorWaitCount++;
-            }
-            
-            TotalIat += p.iat;
-            
-            if (p.leftClinic)
-                continue;
-            
-            totalCount++;
-            TotalExamTime += p.exam_time;
+                NurseWaitCount++;
 
             if (p.type == patientType.MiddleAge)
             {
-                totalMiddleCount++;
-                TotalMiddleExamTime += p.exam_time;
-                NurseSumMiddleAgeTime += p.n_time;
+                MiddleCount++;
+                MiddleWaitSum += p.totalWait;
+                NurseMiddleTimeSum += p.n_time;
+                if (p.d_wait > 0)
+                    MiddleDoctorWaitCount++;
+                if (p.leftClinic)
+                    LeftCount++;
             }
             else
             {
-                totalElderlyCount++;
-                TotalElderlyExamTime += p.exam_time;
-                NurseSumElderlyTime += p.n_time;
+                ElderlyCount++;
+                ElderlyWaitSum += p.totalWait;
+                NurseElderlyTimeSum += p.n_time;
+                if (p.d_wait > 0)
+                    ElderlyDoctorWaitCount++;
+            }
+
+            // Q1 only counts patients who were examined by a doctor
+            if (p.leftClinic)
+                continue;
+
+            ExamCount++;
+            ExamTimeSum += p.exam_time;
+            if (p.type == patientType.MiddleAge)
+            {
+                MiddleExamCount++;
+                MiddleExamTimeSum += p.exam_time;
+            }
+            else
+            {
+                ElderlyExamCount++;
+                ElderlyExamTimeSum += p.exam_time;
             }
         }
 
-        MeanExamTime = TotalExamTime / totalCount;
-        MeanMiddleExamTime = TotalMiddleExamTime / totalMiddleCount; 
-        MeanElderlyExamTime = TotalElderlyExamTime / totalElderlyCount;
-        
-        MeanWaitAverage = TotalWaitAverage / Totalwaitcount;
-        MeanWaitAverageMiddleAge = TotalWaitAverageMiddleAge / totalMiddleWaitcount;
-        MeanWaitAverageElderly = TotalWaitAverageElderly / totalElderlyWaitcount;
+        MeanExamTime = Divide(ExamTimeSum, ExamCount);
+        MeanMiddleExamTime = Divide(MiddleExamTimeSum, MiddleExamCount);
+        MeanElderlyExamTime = Divide(ElderlyExamTimeSum, ElderlyExamCount);
 
-        ProbNurseWait = (double)nurseWaitCount / Totalwaitcount;
-        ProbMiddleDoctorWait = (double)middleDoctorWaitCount / totalMiddleWaitcount;
-        ProbElderlyDoctorWait = (double)elderlyDoctorWaitCount / totalElderlyWaitcount;
-        
-        PortionNurseIdle = 1 - (double)nurseBusyMinutes / simulationEndTime;
+        MeanWait = Divide(WaitSum, PatientCount);
+        MeanWaitMiddleAge = Divide(MiddleWaitSum, MiddleCount);
+        MeanWaitElderly = Divide(ElderlyWaitSum, ElderlyCount);
+
+        ProbNurseWait = Divide(NurseWaitCount, PatientCount);
+        ProbMiddleDoctorWait = Divide(MiddleDoctorWaitCount, MiddleCount);
+        ProbElderlyDoctorWait = Divide(ElderlyDoctorWaitCount, ElderlyCount);
+
+        // Q5: idle = 1 - busy minutes / length of the run, worked out for every doctor
+        PortionNurseIdle = 1 - Divide(nurseBusyMinutes, simulationEndTime);
         foreach (Doctor d in Doctors)
-            if (d.curesElderly && d.curesMiddleAge)
-                PortionElderlyDoctorIdle += 1 - (double)d.busyMinutes / simulationEndTime;
-            else
-                PortionMiddleDoctorIdle += 1 - (double)d.busyMinutes / simulationEndTime;
-        
-        NurseMiddleAgeAvgTime = NurseSumMiddleAgeTime / totalMiddleCount;
-        NurseElderlyAvgTime = NurseSumElderlyTime / totalElderlyCount;
-        
-        MeanIat = TotalIat / ((double)patients.Count - 1);
+            d.idlePortion = 1 - Divide(d.busyMinutes, simulationEndTime);
+        PortionMiddleDoctorIdle = FindDoctor("D1")?.idlePortion ?? 0;
+        PortionElderlyDoctorIdle = FindDoctor("D2")?.idlePortion ?? 0;
+        PortionExtraDoctorIdle = FindDoctor("D3")?.idlePortion ?? 0;
+
+        NurseMiddleAgeAvgTime = Divide(NurseMiddleTimeSum, MiddleCount);
+        NurseElderlyAvgTime = Divide(NurseElderlyTimeSum, ElderlyCount);
+
+        // n patients have only n - 1 gaps between them (the first patient arrives at 0)
+        MeanIat = Divide(IatSum, PatientCount - 1);
+        LeftPercent = Divide(LeftCount, MiddleCount) * 100;
     }
+
+    /// <summary>a / b, or 0 when b is 0.</summary>
+    private static double Divide(double a, double b) => b > 0 ? a / b : 0;
+
+    /// <summary>The doctor with this name, or null if the clinic has none.</summary>
+    private Doctor? FindDoctor(string doctorName) => Doctors.Find(d => d.name == doctorName);
+
+    #endregion
 
     /// <summary>Adds one row to the calendar table.</summary>
     private void AddEvent(int time, string eventName, Patient p, string details)

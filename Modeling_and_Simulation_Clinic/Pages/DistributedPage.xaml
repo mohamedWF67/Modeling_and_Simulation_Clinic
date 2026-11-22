@@ -156,7 +156,7 @@
                 <ui:CardControl.Header>
                     <StackPanel>
                         <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Text="Runs"/>
-                        <TextBlock VerticalAlignment="Center" FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="number of runs"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="How many times the simulation is repeated; the Results page shows the average over all runs"/>
                     </StackPanel>
                 </ui:CardControl.Header>
                 <ui:NumberBox Width="150"

@@ -10,7 +10,7 @@
       xmlns:wpf="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       xmlns:skiaSharpView="clr-namespace:LiveChartsCore.SkiaSharpView;assembly=LiveChartsCore.SkiaSharpView"
       mc:Ignorable="d"
-      d:DataContext="{d:DesignInstance viewModels:statisticsViewModel}"
+      d:DataContext="{d:DesignInstance viewModels:StatisticsViewModel}"
       d:DesignHeight="600"
       d:DesignWidth="800"
       Title="Results">
@@ -224,6 +224,49 @@
                 </StackPanel>
             </ui:Card>
             
+            <TextBlock Text="Q2 Waiting Time Distribution (all patients of all runs)"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,16,0,4"/>
+            <ui:Card>
+                <StackPanel>
+                    <TextBlock Opacity="0.75" TextWrapping="Wrap" Margin="0,0,0,8" Text="{Binding Q2LeftText}"/>
+                    <lvc:CartesianChart Height="300"
+                        Background="Transparent"
+                        LegendPosition="Hidden">
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlColumnSeries
+                                    Values="{Binding Q2WaitHistogram}"
+                                    SeriesName="Patients (%)"
+                                    DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    MaxBarWidth="40"
+                                    ShowDataLabels="True"
+                                    DataLabelsPosition="Top"
+                                    DataLabelsSize="12"/>
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    AxisName="Total wait (minutes)"
+                                    LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    Labels="{Binding Q2WaitHistogramLabels}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+                        <lvc:CartesianChart.YAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    AxisName="% of patients"
+                                    MinLimit="0"
+                                    LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.YAxes>
+                    </lvc:CartesianChart>
+                </StackPanel>
+            </ui:Card>
+
             <TextBlock Text="Q3 Maximum Queue Length"
                        FontWeight="SemiBold" FontSize="14"
                        Margin="4,4,0,4"/>
@@ -232,15 +275,15 @@
                 <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Nurse"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxNurseQueue}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3MaxNurseQueue}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Middle Age"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxMiddleAgeQueue}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3MaxMiddleAgeQueue}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Elderly"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3maxElderlyQueue}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Q3MaxElderlyQueue}"/>
                     </StackPanel>
                 </Grid>
                     <lvc:CartesianChart LegendPosition="Hidden"
@@ -317,7 +360,7 @@
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Doctor Middle Age"/>
-                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4middleDoctorWaitCount}"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q4MiddleDoctorWaitCount}"/>
                         <wpf:PieChart
                             Background="Transparent"
                             Width="120"
@@ -610,6 +653,126 @@
                             </lvc:AxesCollection>
                         </lvc:CartesianChart.YAxes>
 
+                    </lvc:CartesianChart>
+                </StackPanel>
+            </ui:Card>
+
+            <TextBlock Text="Q7 Inter-arrival Time: Table Probability vs Generated Frequency"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,16,0,4"/>
+            <ui:Card>
+                    <lvc:CartesianChart Height="300"
+                        Background="Transparent"
+                        LegendPosition="Bottom"
+                        LegendTextPaint="{wpf:SolidColorPaint Color='#FFFFFF'}">
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlColumnSeries
+                                    Values="{Binding Q7ExpectedFrequency}"
+                                    SeriesName="Probability (table)"
+                                    DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    MaxBarWidth="40"
+                                    ShowDataLabels="True"
+                                    DataLabelsPosition="Top"
+                                    DataLabelsSize="12"/>
+                                <lvc:XamlColumnSeries
+                                    Values="{Binding Q7ObservedFrequency}"
+                                    SeriesName="Frequency (simulation)"
+                                    DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    MaxBarWidth="40"
+                                    ShowDataLabels="True"
+                                    DataLabelsPosition="Top"
+                                    DataLabelsSize="12"/>
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    AxisName="Inter-arrival time"
+                                    LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    Labels="{Binding Q7FrequencyLabels}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+                        <lvc:CartesianChart.YAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    AxisName="Relative frequency"
+                                    MinLimit="0"
+                                    LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.YAxes>
+                    </lvc:CartesianChart>
+            </ui:Card>
+
+            <TextBlock Text="Q8 Effect of a Third Doctor on the Average Wait (same patients)"
+                       FontWeight="SemiBold" FontSize="14"
+                       Margin="4,16,0,4"/>
+            <ui:Card>
+                <StackPanel>
+                <TextBlock Opacity="0.75" TextWrapping="Wrap" Margin="0,0,0,8"
+                           Text="The third doctor (D3) examines middle-age patients. Each run is repeated with the same seed, so both clinics see exactly the same patients."/>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="*,*,*,*">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Middle-age change"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q8WaitMiddleChange}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Elderly change"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q8WaitElderlyChange}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="All patients change"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q8WaitAllChange}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Vertical" Margin="0,0,8,0" HorizontalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="D3 idle portion"/>
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Text="{Binding Q8ExtraDoctorIdle}"/>
+                    </StackPanel>
+                </Grid>
+                    <lvc:CartesianChart Height="300"
+                        Background="Transparent"
+                        LegendPosition="Bottom"
+                        LegendTextPaint="{wpf:SolidColorPaint Color='#FFFFFF'}">
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlColumnSeries
+                                    Values="{Binding Q8TwoDoctors}"
+                                    SeriesName="2 doctors"
+                                    DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    MaxBarWidth="40"
+                                    ShowDataLabels="True"
+                                    DataLabelsPosition="Top"
+                                    DataLabelsSize="12"/>
+                                <lvc:XamlColumnSeries
+                                    Values="{Binding Q8ThreeDoctors}"
+                                    SeriesName="3 doctors"
+                                    DataLabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    MaxBarWidth="40"
+                                    ShowDataLabels="True"
+                                    DataLabelsPosition="Top"
+                                    DataLabelsSize="12"/>
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    AxisName="Patients"
+                                    LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    Labels="{Binding Q8Labels}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+                        <lvc:CartesianChart.YAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlAxis
+                                    AxisName="Average wait (minutes)"
+                                    MinLimit="0"
+                                    LabelsPaint="{wpf:SolidColorPaint Color='#FFFFFF'}"
+                                    NamePaint="{wpf:SolidColorPaint Color='#FFFFFF'}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.YAxes>
                     </lvc:CartesianChart>
                 </StackPanel>
             </ui:Card>
